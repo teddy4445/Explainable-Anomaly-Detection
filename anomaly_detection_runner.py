@@ -6,7 +6,7 @@ from consts import *
 from anomaly_detection.z_score import Zscore
 
 
-class AnomalyDetectionAlgo:
+class AnomalyDetectionRunner:
     """
     A class with multiple anomaly detection algorithms that standardize them so it will be easy to test
     """
@@ -27,10 +27,10 @@ class AnomalyDetectionAlgo:
         This method runs an algorithm on the experiment's data and stores the results needed for this experiment
         """
         self.models = {}
-        for name, algo in AnomalyDetectionAlgo.ALGOS.items():
+        for name, algo in AnomalyDetectionRunner.ALGOS.items():
             self.models[name] = algo().train(x=x,
                                              y=y,
-                                             properties=AnomalyDetectionAlgo.PROPERTIES[name])
+                                             properties=AnomalyDetectionRunner.PROPERTIES[name])
 
     def test(self,
              x: pd.DataFrame,
