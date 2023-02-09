@@ -1,9 +1,8 @@
 # library imports
-import os
+import pandas as pd
 
 # project imports
-from consts import *
-from experiment import Experiment
+from experiments.experiment_properties import Experiment
 
 
 class ExperimentRealData(Experiment):
@@ -14,9 +13,13 @@ class ExperimentRealData(Experiment):
     def __init__(self):
         Experiment.__init__(self)
 
-    def run(self):
+    def run(self,
+            algo,
+            dataset: pd.DataFrame,
+            anomaly_sample: list,
+            f_diff: list):
         """
-        This method runs an algorithm on the experiment's data and stores the results needed for this experiment
+        This method runs an algorithm on the experiment_properties's data and stores the results needed for this experiment_properties
         """
         pass
 

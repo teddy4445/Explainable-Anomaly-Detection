@@ -1,11 +1,9 @@
 # library imports
-import os
 import numpy as np
 import pandas as pd
 
 # project imports
 from consts import *
-from experiment.feature_distribution import FeatureDistribution
 
 
 class SyntheticDatasetGeneration:

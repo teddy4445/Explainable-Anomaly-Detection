@@ -1,10 +1,8 @@
 # library imports
-import os
 import numpy as np
 
 # project imports
-from consts import *
-from experiment.feature_distribution import FeatureDistribution
+from experiments.experiment_properties.feature_distribution import FeatureDistribution
 
 
 class FeatureDistributionNormal(FeatureDistribution):
