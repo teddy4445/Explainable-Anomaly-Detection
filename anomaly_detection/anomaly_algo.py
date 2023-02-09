@@ -43,9 +43,9 @@ class AnomalyAlgo:
     def predict(self,
                 x: pd.DataFrame):
         """
-        This method  used to train the algorithm
+        This method used to inference
         """
         # TODO: handle the case in which x is 1-dim and make it 2-dim so it will work
-        if mertic is None:
-            metric = accuracy_score
+        # if metric is None:
+            # metric = accuracy_score
         # TODO: finish later
