@@ -26,7 +26,7 @@ class OneClassSVM(AnomalyAlgo):
         self._data = None
 
     def train(self,
-              x: pd.DataFrame,
+              x: pd.DataFrame
               y: pd.DataFrame = None,
               properties: dict = None):
         """
