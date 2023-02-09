@@ -20,7 +20,7 @@ class Zscore(AnomalyAlgo):
 
     def __init__(self):
         AnomalyAlgo.__init__(self)
-        self.trasholds = {}
+        self.thresholds = {}
 
     def train(self,
               x: pd.DataFrame,
@@ -29,15 +29,15 @@ class Zscore(AnomalyAlgo):
         # Make sure we can work
         assert Zscore.PROPERTY_NAME in properties
         # the properties of the algo
-        self.trasholds = {}
+        self.thresholds = {}
         for col in list(x):
             mean_val = x[col].mean()
             std_val = x[col].std()
-            self.trasholds[col][Zscore.TRASH_UP] = mean_val + properties[Zscore.PROPERTY_NAME] * std_val
-            self.trasholds[col][Zscore.TRASH_DOWN] = mean_val - properties[Zscore.PROPERTY_NAME] * std_val
+            self.thresholds[col][Zscore.TRASH_UP] = mean_val + properties[Zscore.PROPERTY_NAME] * std_val
+            self.thresholds[col][Zscore.TRASH_DOWN] = mean_val - properties[Zscore.PROPERTY_NAME] * std_val
 
     def predict(self,
                 x: pd.DataFrame):
-        return x.apply(lambda row: any([row[col] > self.trasholds[col][Zscore.TRASH_UP] or
-                                        row[col] < self.trasholds[col][Zscore.TRASH_DOWN]
+        return x.apply(lambda row: any([row[col] > self.thresholds[col][Zscore.TRASH_UP] or
+                                        row[col] < self.thresholds[col][Zscore.TRASH_DOWN]
                                         for col in row]))
