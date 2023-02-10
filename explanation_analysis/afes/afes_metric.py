@@ -5,13 +5,21 @@ import pandas as pd
 
 class AfesMetric:
     """
-    An abstract class for a similarity used in this project
+    TODO: noam please add here
     """
 
-    def afes(self,
-             d: pd.DataFrame,
-             s: pd.Series,
-             f_sim: list,
-             f_diff: list,
-             sim: Callable):
+    def __init__(self,
+                 sim: Callable):
+        self.sim = sim
+
+    def compute(self,
+                d: pd.DataFrame,
+                s: list,
+                f_sim: list,
+                f_diff: list):
+        pass
+
+    def compute_all_features(self,
+                             d: pd.DataFrame,
+                             s: list):
         pass
