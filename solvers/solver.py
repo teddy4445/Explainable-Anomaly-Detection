@@ -1,7 +1,8 @@
 # library imports
-from collections import Callable
-
 import pandas as pd
+
+# project imports
+from explanation_analysis.afes.afes_metric import AfesMetric
 
 
 class Solver:
@@ -16,8 +17,8 @@ class Solver:
     def solve(self,
               d: pd.DataFrame,
               s: list,
-              time_limit_seconds: int,
-              scorer: Callable) -> tuple:
+              time_limit_seconds: float,
+              scorer: AfesMetric) -> tuple:
         pass
 
     def get_convergence_process(self) -> list:
