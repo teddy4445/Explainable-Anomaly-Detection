@@ -3,25 +3,29 @@ import pandas as pd
 from sklearn.covariance import EllipticEnvelope
 
 # project imports
-from consts import *
-from anomaly_detection.anomaly_algo import AnomalyAlgo
+from anomaly_detection_algos.anomaly_algo import AnomalyAlgo
 
 
-class OneClassSVM(AnomalyAlgo):
+class DBSCAN(AnomalyAlgo):
     """
     A ...
     """
 
     # CONSTS #
-    NAME = ""
+    NAME = "DBSCAN"
     # END - CONSTS #
 
     def __init__(self,
-                 store_precision=True, assume_centered=False, support_fraction=None, contamination=0.1,
-                 random_state=None):
+                 store_precision=True,
+                 assume_centered=False,
+                 support_fraction=None,
+                 contamination: float = 0.1,
+                 random_state: int = None):
         AnomalyAlgo.__init__(self)
-        self.model = EllipticEnvelope(store_precision=store_precision, assume_centered=assume_centered,
-                                      support_fraction=support_fraction, contamination=contamination,
+        self.model = EllipticEnvelope(store_precision=store_precision,
+                                      assume_centered=assume_centered,
+                                      support_fraction=support_fraction,
+                                      contamination=contamination,
                                       random_state=random_state)
         self._data = None
 

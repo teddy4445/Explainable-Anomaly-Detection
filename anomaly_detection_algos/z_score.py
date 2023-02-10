@@ -3,7 +3,7 @@ import pandas as pd
 
 # project imports
 from consts import *
-from anomaly_detection.anomaly_algo import AnomalyAlgo
+from anomaly_detection_algos.anomaly_algo import AnomalyAlgo
 
 
 class Zscore(AnomalyAlgo):

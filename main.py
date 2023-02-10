@@ -1,10 +1,11 @@
 # library imports
-import os
 
 # project imports
 from consts import *
-from experiment_real_data import ExperimentRealData
-from experiment_synthetic import ExperimentSynthetic
+from anomaly_detection_algos.z_score import Zscore
+from experiments.experiment_real_data import ExperimentRealData
+from experiments.experiment_synthetic import ExperimentSynthetic
+from solvers.mc_solver import MonteCarloSolver
 
 
 class Main:
@@ -29,10 +30,15 @@ class Main:
         # load experiments
         synthetic_data_exp = ExperimentSynthetic()
         real_data_exp = ExperimentRealData()
-        # load algorithm
-        # TODO: add later
+        # load algorithms
+        algos = {
+            Zscore.NAME: Zscore
+        }
+        algo_properties = {
+            Zscore.NAME: {Zscore.PROPERTY_NAME: 1.0}
+        }
+        sovler = MonteCarloSolver()
         # run them
-        # TODO: add later
         # check results
         # TODO: add later
         # save results
@@ -41,6 +47,5 @@ class Main:
         # 3) prepare plots for the paper
         # TODO: add later
 
-
-if __name__ == '__main__':
-    Main.run()
+        if __name__ == '__main__':
+            Main.run()
