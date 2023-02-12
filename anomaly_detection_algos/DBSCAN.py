@@ -1,6 +1,6 @@
 # library imports
 import pandas as pd
-from sklearn.covariance import EllipticEnvelope
+from sklearn.cluster import DBSCAN
 
 # project imports
 from anomaly_detection_algos.anomaly_algo import AnomalyAlgo
@@ -16,17 +16,22 @@ class DBSCAN(AnomalyAlgo):
     # END - CONSTS #
 
     def __init__(self,
-                 store_precision=True,
-                 assume_centered=False,
-                 support_fraction=None,
-                 contamination: float = 0.1,
-                 random_state: int = None):
+                 eps=0.5,
+                 min_samples=5,
+                 metric='euclidean',
+                 metric_params=None, algorithm='auto',
+                 leaf_size=30,
+                 p=None,
+                 n_jobs=None):
         AnomalyAlgo.__init__(self)
-        self.model = EllipticEnvelope(store_precision=store_precision,
-                                      assume_centered=assume_centered,
-                                      support_fraction=support_fraction,
-                                      contamination=contamination,
-                                      random_state=random_state)
+        self.model = DBSCAN(eps=eps,
+                            min_samples=min_samples,
+                            metric=metric,
+                            metric_params=metric_params,
+                            algorithm=algorithm,
+                            leaf_size=leaf_size,
+                            p=p,
+                            n_jobs=n_jobs)
         self._data = None
 
     def train(self,
@@ -43,9 +48,9 @@ class DBSCAN(AnomalyAlgo):
     def predict(self,
                 x: pd.DataFrame):
         """
-        This method used to inference
+        This method used to inference - but is also training the model first
         """
-        return self.model.predict(X=x)
+        return self.model.fit_predict(X=x)
 
 
 if __name__ == '__main__':
