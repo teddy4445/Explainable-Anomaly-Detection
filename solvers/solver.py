@@ -2,6 +2,7 @@
 import pandas as pd
 
 # project imports
+from anomaly_detection_algos.anomaly_algo import AnomalyAlgo
 from explanation_analysis.afes.afes_metric import AfesMetric
 
 
@@ -15,6 +16,7 @@ class Solver:
         self.convert_process = []
 
     def solve(self,
+              anomaly_algo: AnomalyAlgo,
               d: pd.DataFrame,
               s: list,
               time_limit_seconds: float,
