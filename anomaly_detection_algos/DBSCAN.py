@@ -34,7 +34,7 @@ class DBSCAN(AnomalyAlgo):
                             n_jobs=n_jobs)
         self._data = None
 
-    def train(self,
+    def fit(self,
               x: pd.DataFrame,
               y: pd.DataFrame = None,
               properties: dict = None):

@@ -29,7 +29,7 @@ class EllipticEnvelope(AnomalyAlgo):
                                       random_state=random_state)
         self._data = None
 
-    def train(self,
+    def fit(self,
               x: pd.DataFrame,
               y: pd.DataFrame = None,
               properties: dict = None):

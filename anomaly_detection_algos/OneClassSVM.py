@@ -41,7 +41,7 @@ class OneClassSVM(AnomalyAlgo):
                            max_iter=max_iter,
                            contamination=contamination)
 
-    def train(self,
+    def fit(self,
               x: pd.DataFrame,
               y: pd.DataFrame = None,
               properties: dict = None):
