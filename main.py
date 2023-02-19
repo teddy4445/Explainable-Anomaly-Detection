@@ -36,19 +36,20 @@ class Main:
         # generate datasets
         synthetic_data_exp = Experiment(time_limit_seconds=30)
         # generate dataset
-        f_diff_list = [["a"], ["a", "b"], ["c"]]
-        d_tag_size_list = [50, 85, 50]
-        dataset = SyntheticDatasetGeneration.generate_one(anomaly_detection_algorithm=DBSCANwrapper(),
-                                                          row_count=200,
-                                                          cols_dist_functions={
-                                                              "a": FeatureDistributionNormal(mean=1, std=0.5),
-                                                              "b": FeatureDistributionNormal(mean=0.8, std=0.7),
-                                                              "c": FeatureDistributionNormal(mean=5, std=1)
-                                                          },
-                                                          f_diff_list=f_diff_list,
-                                                          d_tag_size_list=d_tag_size_list,
-                                                          save_csv=os.path.join(RESULTS_FOLDER_PATH, "main_synt_example.csv")
-                                                          )
+        f_diff = [0, 1]
+        d_tag_size = 10
+        dataset, d_tag = SyntheticDatasetGeneration.generate_one(anomaly_detection_algorithm=DBSCANwrapper(),
+                                                                 row_count=50,
+                                                                 cols_dist_functions={
+                                                                     "a": FeatureDistributionNormal(mean=1, std=0.5),
+                                                                     "b": FeatureDistributionNormal(mean=0.8, std=0.7),
+                                                                     "c": FeatureDistributionNormal(mean=5, std=1)
+                                                                 },
+                                                                 f_diff=f_diff,
+                                                                 d_tag_size=d_tag_size,
+                                                                 save_csv=os.path.join(RESULTS_FOLDER_PATH,
+                                                                                       "main_synt_example.csv")
+                                                                 )
 
         # run experiment
         synthetic_data_exp.run(anomaly_algo=DBSCANwrapper(),
@@ -57,9 +58,9 @@ class Main:
                                               w_gsim=1,
                                               w_ldiff=1,
                                               w_lsim=1),
-                               d_tags=d_tag_size_list,
-                               f_diff_list=f_diff_list,
-                               anomaly_sample=list(np.cumsum(d_tag_size_list)),
+                               d_tags=[d_tag],
+                               f_diff_list=[f_diff],
+                               anomaly_sample=[-1],
                                dataset=dataset
                                )
         # check results
