@@ -37,7 +37,7 @@ class IsolationForest(AnomalyAlgo):
                              random_state=random_state,
                              verbose=verbose)
 
-    def train(self,
+    def fit(self,
               x: pd.DataFrame,
               y: pd.DataFrame = None,
               properties: dict = None):

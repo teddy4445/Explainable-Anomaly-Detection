@@ -5,8 +5,9 @@ from time import time
 from sklearn.neighbors import KNeighborsRegressor
 
 # project imports
-from explanation_analysis.afes.afes_metric import AfesMetric
 from solvers.solver import Solver
+from anomaly_detection_algos.anomaly_algo import AnomalyAlgo
+from explanation_analysis.afes.afes_metric import AfesMetric
 
 
 class KnnSolver(Solver):
@@ -23,6 +24,7 @@ class KnnSolver(Solver):
             raise Exception("KnnSovler.__init__ error saying that 'k' is possitive integer")
 
     def solve(self,
+              anomaly_algo: AnomalyAlgo,
               d: pd.DataFrame,
               s: list,
               time_limit_seconds: int,

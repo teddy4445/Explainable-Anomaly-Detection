@@ -22,7 +22,7 @@ class Zscore(AnomalyAlgo):
         AnomalyAlgo.__init__(self)
         self.thresholds = {}
 
-    def train(self,
+    def fit(self,
               x: pd.DataFrame,
               y: pd.DataFrame = None,
               properties: dict = None):

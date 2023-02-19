@@ -4,8 +4,9 @@ import pandas as pd
 from time import time
 
 # project imports
-from explanation_analysis.afes.afes_metric import AfesMetric
 from solvers.solver import Solver
+from anomaly_detection_algos.anomaly_algo import AnomalyAlgo
+from explanation_analysis.afes.afes_metric import AfesMetric
 
 
 class MonteCarloSolver(Solver):
@@ -18,6 +19,7 @@ class MonteCarloSolver(Solver):
 
     def solve(self,
               d: pd.DataFrame,
+              anomaly_algo: AnomalyAlgo,
               s: list,
               time_limit_seconds: int,
               scorer: AfesMetric) -> tuple:
