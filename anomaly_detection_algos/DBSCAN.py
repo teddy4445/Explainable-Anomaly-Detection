@@ -6,13 +6,14 @@ from sklearn.cluster import DBSCAN
 from anomaly_detection_algos.anomaly_algo import AnomalyAlgo
 
 
-class DBSCAN(AnomalyAlgo):
+class DBSCANwrapper(AnomalyAlgo):
     """
     A ...
     """
 
     # CONSTS #
     NAME = "DBSCAN"
+
     # END - CONSTS #
 
     def __init__(self,
@@ -32,26 +33,19 @@ class DBSCAN(AnomalyAlgo):
                             leaf_size=leaf_size,
                             p=p,
                             n_jobs=n_jobs)
-        self._data = None
 
     def fit(self,
-              x: pd.DataFrame,
-              y: pd.DataFrame = None,
-              properties: dict = None):
+            x: pd.DataFrame,
+            y: pd.DataFrame = None):
         """
         This method used to train the algorithm
         """
-        if not self._data:
-            self._data = x
-            self.model.fit(X=x, y=y)
+        self.model.fit(X=x,
+                       y=y)
 
     def predict(self,
                 x: pd.DataFrame):
         """
         This method used to inference - but is also training the model first
         """
-        return self.model.fit_predict(X=x)
-
-
-if __name__ == '__main__':
-    print()
+        return [val == -1 for val in self.model.fit_predict(X=x)]

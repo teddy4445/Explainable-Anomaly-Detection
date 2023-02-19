@@ -16,13 +16,13 @@ class AnomalyAlgo:
 
     # END - CONSTS #
 
-    def __init__(self):
-        pass
+    def __init__(self,
+                 properties: dict = None):
+        self.properties = properties if isinstance(properties, dict) else {}
 
     def fit(self,
             x: pd.DataFrame,
-            y: pd.DataFrame = None,
-            properties: dict = None):
+            y: pd.DataFrame = None):
         """
         This method used to train the algorithm
         """
@@ -54,24 +54,20 @@ class AnomalyAlgo:
     def fit_than_predict(self,
                          x: pd.DataFrame,
                          x_predict: pd.DataFrame,
-                         y: pd.DataFrame = None,
-                         properties: dict = None):
+                         y: pd.DataFrame = None):
         """
         This method used to train the algorithm and than make a prediction right after
         """
         self.fit(x=x,
-                 y=y,
-                 properties=properties)
+                 y=y)
         return self.predict(x=x_predict)
 
     def fit_and_self_predict(self,
                              x: pd.DataFrame,
-                             y: pd.DataFrame = None,
-                             properties: dict = None):
+                             y: pd.DataFrame = None):
         """
         This method used to train the algorithm and than make a prediction right after
         """
         self.fit(x=x,
-                 y=y,
-                 properties=properties)
+                 y=y)
         return self.predict(x=x)

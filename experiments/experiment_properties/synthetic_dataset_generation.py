@@ -36,23 +36,19 @@ class SyntheticDatasetGeneration:
         assert sum(d_tag_size_list) > len(d_tag_size_list)
         assert sum(d_tag_size_list) + len(d_tag_size_list) < row_count
         assert len(d_tag_size_list) == len(f_diff_list)
-        assert type(anomaly_detection_algorithm) == AnomalyAlgo
+        assert issubclass(type(anomaly_detection_algorithm), AnomalyAlgo)
 
         # get the feature functions as list to query later
         cols_functions_list = list(cols_dist_functions.values())
 
         samples = []
         for anomaly_index, d_tag_size in enumerate(d_tag_size_list):
-            d_tag = []
+            d_tag = [[feature_func.sample() for feature_name, feature_func in cols_dist_functions.items()] for _ in range(d_tag_size)]
             # build d_tag
-            while len(d_tag) < d_tag_size + 1:
-                # make a random value for D'
-                a = [feature_func.sample() for feature_name, feature_func in cols_dist_functions.items()]
-                # train the anomaly detection algorithms on the current D'
-                anomaly_detection_algorithm.fit(pd.DataFrame(d_tag))
-                # check if a is not anomaly to the current D', if so add it
-                if not anomaly_detection_algorithm.predict(pd.DataFrame([a]))[0]:
-                    d_tag.append(a)
+            while sum(anomaly_detection_algorithm.fit_and_self_predict(x=pd.DataFrame(d_tag))) != 1:
+                # try again
+                d_tag = [[feature_func.sample() for feature_name, feature_func in cols_dist_functions.items()] for _ in
+                         range(d_tag_size)]
             # convert the last line to be an anomaly
             # this would work due to the entropy of random walk in high dimension
             anomaly_sample = [feature_func.sample() for feature_name, feature_func in cols_dist_functions.items()]

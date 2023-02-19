@@ -6,7 +6,7 @@ from pyod.models.ocsvm import OCSVM
 from anomaly_detection_algos.anomaly_algo import AnomalyAlgo
 
 
-class OneClassSVM(AnomalyAlgo):
+class OneClassSVMwrapper(AnomalyAlgo):
     """
     A ...
     """
@@ -42,9 +42,8 @@ class OneClassSVM(AnomalyAlgo):
                            contamination=contamination)
 
     def fit(self,
-              x: pd.DataFrame,
-              y: pd.DataFrame = None,
-              properties: dict = None):
+            x: pd.DataFrame,
+            y: pd.DataFrame = None):
         """
         This method used to train the algorithm
         """

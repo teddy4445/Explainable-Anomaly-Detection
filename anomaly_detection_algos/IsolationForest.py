@@ -7,7 +7,7 @@ from consts import *
 from anomaly_detection_algos.anomaly_algo import AnomalyAlgo
 
 
-class IsolationForest(AnomalyAlgo):
+class IsolationForestwrapper(AnomalyAlgo):
     """
     A ...
     """
@@ -39,8 +39,7 @@ class IsolationForest(AnomalyAlgo):
 
     def fit(self,
               x: pd.DataFrame,
-              y: pd.DataFrame = None,
-              properties: dict = None):
+              y: pd.DataFrame = None):
         """
         This method used to train the algorithm
         """

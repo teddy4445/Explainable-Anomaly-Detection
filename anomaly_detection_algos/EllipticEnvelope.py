@@ -6,7 +6,7 @@ from sklearn.covariance import EllipticEnvelope
 from anomaly_detection_algos.anomaly_algo import AnomalyAlgo
 
 
-class EllipticEnvelope(AnomalyAlgo):
+class EllipticEnvelopewrapper(AnomalyAlgo):
     """
     A ...
     """
@@ -31,8 +31,7 @@ class EllipticEnvelope(AnomalyAlgo):
 
     def fit(self,
               x: pd.DataFrame,
-              y: pd.DataFrame = None,
-              properties: dict = None):
+              y: pd.DataFrame = None):
         """
         This method used to train the algorithm
         """
@@ -48,5 +47,3 @@ class EllipticEnvelope(AnomalyAlgo):
         return self.model.predict(X=x)
 
 
-if __name__ == '__main__':
-    print()
