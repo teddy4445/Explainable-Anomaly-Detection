@@ -30,9 +30,9 @@ class MonteCarloSolver(Solver):
         # run until the time is over
         while (time() - start_time) < time_limit_seconds or best_ans is None:
             # pick number of rows
-            row_count = random.randint(0, d.shape[0])
+            row_count = random.randint(1, d.shape[0])
             # pick number of cols
-            col_count = random.randint(0, d.shape[1])
+            col_count = random.randint(1, d.shape[1])
             # pick rows for D' at random
             rows_indexes = list(range(d.shape[0]))
             random.shuffle(rows_indexes)
@@ -40,7 +40,7 @@ class MonteCarloSolver(Solver):
             # pick cols for F_{diff} at random
             cols_indexes = list(range(d.shape[1]))
             random.shuffle(cols_indexes)
-            cols_indexes = rows_indexes[:col_count]
+            cols_indexes = cols_indexes[:col_count]
             # obtain the D' with F_{diff}
             ans = d.iloc[rows_indexes, cols_indexes]
             # score it

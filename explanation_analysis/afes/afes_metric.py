@@ -2,6 +2,9 @@
 from collections import Callable
 import pandas as pd
 
+# project imports
+from explanation_analysis.similarity_metrices.sim_metric import SimMetric
+
 
 class AfesMetric:
     """
@@ -9,8 +12,8 @@ class AfesMetric:
     """
 
     def __init__(self,
-                 sim: Callable):
-        self.sim = sim
+                 sim_module: SimMetric):
+        self.sim_module = sim_module
 
     def compute(self,
                 d: pd.DataFrame,

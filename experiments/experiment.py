@@ -1,5 +1,7 @@
 # library imports
 import os
+import time
+
 import pandas as pd
 
 # project imports
@@ -30,11 +32,16 @@ class Experiment:
         """
         This method runs an algorithm on the experiment_properties's data and stores the results needed for this experiment_properties
         """
-        self.results = solver.solve(d=dataset,
+        solving_start_time = time.perf_counter()
+        best_ans, best_ans_score = solver.solve(d=dataset,
                                     anomaly_algo=anomaly_algo,
                                     s=anomaly_sample,
                                     time_limit_seconds=self._time_limit_seconds,
                                     scorer=scorer)
+        solving_end_time = time.perf_counter()
+        solving_time = solving_end_time - solving_start_time
+
+        self.results = {"best_ans": best_ans, "best_ans_score": best_ans_score, "solving_time": solving_time}
         self.baseline = {
             "d_tags": d_tags,
             "f_diff_list": f_diff_list

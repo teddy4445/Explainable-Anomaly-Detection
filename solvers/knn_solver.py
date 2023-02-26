@@ -39,8 +39,8 @@ class KnnSolver(Solver):
         knn.fit(d, list(range(d.shape[0])))  # the y is useless so we just put indexes, it can be any value
         rows_indexes = knn.kneighbors(X=[s],
                                       n_neighbors=self._k,
-                                      return_distance=False)
-        d_tag_full_f = d[rows_indexes, :]
+                                      return_distance=False)[0]
+        d_tag_full_f = d.iloc[rows_indexes]
         f_diff_dist_vector = np.abs(np.array(s) - np.array(d_tag_full_f.mean(axis=0)))
         # run until the time is over
         while ((time() - start_time) < time_limit_seconds or best_ans is None) and (f_diff_size < d.shape[1]):

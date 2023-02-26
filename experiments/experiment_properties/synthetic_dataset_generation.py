@@ -47,10 +47,9 @@ class SyntheticDatasetGeneration:
         d_anomalies = anomaly_detection_algorithm.fit_and_self_predict(x=d)
         while sum(d_anomalies) > 0:
             d = d[[not val for val in d_anomalies]]
-            d = d.append(pd.DataFrame(
+            d = pd.concat([d, pd.DataFrame(
                 [[feature_func.sample() for feature_name, feature_func in cols_dist_functions.items()] for _ in
-                 range(row_count - d.shape[0])]),
-                         ignore_index=True)
+                 range(row_count - d.shape[0])])], ignore_index=True)
             d_anomalies = anomaly_detection_algorithm.fit_and_self_predict(x=d)
 
         # at this point we have D fine and wish to generate a single d_tag
