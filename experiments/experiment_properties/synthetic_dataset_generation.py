@@ -6,6 +6,7 @@ from anomaly_detection_algos.anomaly_algo import AnomalyAlgo
 
 # project imports
 from consts import *
+from explanation_analysis.similarity_metrices.sim_metric import SimMetric
 
 
 class SyntheticDatasetGeneration:
@@ -22,6 +23,8 @@ class SyntheticDatasetGeneration:
                      cols_dist_functions: dict,
                      f_diff: list,
                      d_tag_size: int,
+                     performance_metric: SimMetric = None,
+                     performance_metric_attempts: int = 0,
                      save_csv: str = None) -> tuple:
         """
         This function generates a single CSV file, and saves it if a path given such that the user controls the number of rows, cols, anomalise, and data dist
@@ -31,6 +34,8 @@ class SyntheticDatasetGeneration:
         :param d_tag_size: the size of the d_tag dataset size
         :param f_diff: list of the features' indices that would determinate the anomalies
         :param save_csv: if not None, save the results into a csv file
+        :param performance_metric: a metric to score D'
+        :param performance_metric_attempts: number of times we try to generate better D'
         :return: pd.DataFrame with the dataset
         """
         # make sure the inputs are legit
@@ -65,13 +70,43 @@ class SyntheticDatasetGeneration:
         s = d.iloc[-1, :]
         d_tag.append([s])
         # generate s
-        while sum(anomaly_detection_algorithm.fit_and_self_predict(x=d_tag)) != 1 and sum(
-                anomaly_detection_algorithm.fit_and_self_predict(x=d)) != 1:
-            anomaly_sample = d.iloc[-1, :]
-            anomaly_sample = [anomaly_sample[index] if index not in f_diff else cols_functions_list[index].sample() for
-                              index in range(len(anomaly_sample))]
-            d.iloc[-1, :] = anomaly_sample
-            d_tag.iloc[-1, :] = anomaly_sample
+
+        #  if metric is given, we can try and improve D'
+        if performance_metric_attempts > 0 and isinstance(performance_metric, SimMetric):
+            best_score = 0
+            for attempt in range(performance_metric_attempts):
+                d_tag_anomalies = [True]
+                while sum(d_tag_anomalies) > 0:
+                    d_tag_index_list = list(range(d.shape[0]))
+                    random.shuffle(d_tag_index_list)
+                    rows_indexes = d_tag_index_list[:d_tag_size]
+                    d_tag = d.iloc[rows_indexes, :]
+                    d_tag_anomalies = anomaly_detection_algorithm.fit_and_self_predict(x=d_tag)
+                while sum(anomaly_detection_algorithm.fit_and_self_predict(x=d_tag)) != 1 or sum(
+                        anomaly_detection_algorithm.fit_and_self_predict(x=d)) != 1:
+                    anomaly_sample = d.iloc[-1, :]
+                    anomaly_sample = [
+                        anomaly_sample[index] if index not in f_diff else cols_functions_list[index].sample() for
+                        index in range(len(anomaly_sample))]
+                    d.iloc[-1, :] = anomaly_sample
+                    d_tag.iloc[-1, :] = anomaly_sample
+                # calc new score
+                current_score = performance_metric.sim(d=d_tag,
+                                                       s=anomaly_sample,
+                                                       f_diff=f_diff,
+                                                       f_sim=list(set(list(d)) - set(f_diff)))
+                if current_score < best_score:
+                    best_score = current_score
+                    best_d_tag = d_tag
+            d_tag = best_d_tag
+        else:
+            while sum(anomaly_detection_algorithm.fit_and_self_predict(x=d_tag)) != 1 or sum(
+                    anomaly_detection_algorithm.fit_and_self_predict(x=d)) != 1:
+                anomaly_sample = d.iloc[-1, :]
+                anomaly_sample = [anomaly_sample[index] if index not in f_diff else cols_functions_list[index].sample() for
+                                  index in range(len(anomaly_sample))]
+                d.iloc[-1, :] = anomaly_sample
+                d_tag.iloc[-1, :] = anomaly_sample
 
         # if have path, save it as CSV file
         if save_csv is not None and isinstance(save_csv, str) and os.path.exists(os.path.dirname(save_csv)):
