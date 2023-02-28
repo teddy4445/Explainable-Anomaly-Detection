@@ -1,4 +1,5 @@
 # library imports
+from __future__ import annotations
 import pandas as pd
 
 # project imports
@@ -11,8 +12,8 @@ class ProbSim(SimMetric):
     """
 
     def sim(self,
-            d: pd.DataFrame,
-            s: pd.Series,
+            d: list | pd.pd.DataFrame,
+            s: list | pd.pd.Series,
             f_sim: list,
             f_diff: list):
         reduced_d = d
