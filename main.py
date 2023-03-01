@@ -51,20 +51,21 @@ class Main:
             print(f"generate dataset {iteration}")
             f_diff = [0, 1]
             d_tag_size = 10
-            dataset, d_tag = SyntheticDatasetGeneration.generate_one(anomaly_detection_algorithm=DBSCANwrapper(),
-                                                                     row_count=50,
-                                                                     cols_dist_functions={
-                                                                         "a": FeatureDistributionNormal(mean=1,
-                                                                                                        std=0.5),
-                                                                         "b": FeatureDistributionNormal(mean=0.8,
-                                                                                                        std=0.7),
-                                                                         "c": FeatureDistributionNormal(mean=5, std=1)
-                                                                     },
-                                                                     f_diff=f_diff,
-                                                                     d_tag_size=d_tag_size,
-                                                                     save_csv=os.path.join(RESULTS_FOLDER_PATH,
-                                                                                           "main_synt_example.csv")
-                                                                     )
+            dataset, d_tag, _ = SyntheticDatasetGeneration.generate_one(anomaly_detection_algorithm=DBSCANwrapper(),
+                                                                        row_count=50,
+                                                                        cols_dist_functions={
+                                                                            "a": FeatureDistributionNormal(mean=1,
+                                                                                                           std=0.5),
+                                                                            "b": FeatureDistributionNormal(mean=0.8,
+                                                                                                           std=0.7),
+                                                                            "c": FeatureDistributionNormal(mean=5,
+                                                                                                           std=1)
+                                                                        },
+                                                                        f_diff=f_diff,
+                                                                        d_tag_size=d_tag_size,
+                                                                        save_csv=os.path.join(RESULTS_FOLDER_PATH,
+                                                                                              "main_synt_example")
+                                                                        )
 
             # run experiments
             print(f"run experiment {iteration}")
