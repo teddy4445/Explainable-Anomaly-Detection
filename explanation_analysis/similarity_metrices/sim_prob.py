@@ -16,7 +16,7 @@ class ProbSim(SimMetric):
             s: list | pd.pd.Series,
             f_sim: list,
             f_diff: list):
-        reduced_d = d
+        reduced_d = d.copy()
         for feature in f_sim:
             reduced_d = reduced_d.loc[reduced_d[feature] == s[feature]]
         return len(reduced_d) / len(d)
