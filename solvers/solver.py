@@ -13,7 +13,12 @@ class Solver:
 
     def __init__(self):
         self._param = None
-        self.convert_process = []
+        self.convert_process = {
+            "time": [],
+            "rows_indexes": [],
+            "cols_indexes": [],
+            "score": []
+        }
 
     def solve(self,
               anomaly_algo: AnomalyAlgo,

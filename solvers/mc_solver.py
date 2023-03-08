@@ -26,7 +26,7 @@ class MonteCarloSolver(Solver):
         start_time = time()
         # check what is the best solution
         best_ans = None
-        best_ans_score = 99999
+        best_ans_score = 0
         # run until the time is over
         while (time() - start_time) < time_limit_seconds or best_ans is None:
             # pick number of rows
@@ -46,13 +46,17 @@ class MonteCarloSolver(Solver):
             # score it
             score = scorer.compute_all_features(ans, s)
             # if best so far, replace and record
-            if score < best_ans_score:
+            if score > best_ans_score:
                 best_ans_score = score
                 best_ans = ans
-                self.convert_process.append({
-                    "rows_indexes": rows_indexes,
-                    "cols_indexes": cols_indexes,
-                    "score": score}
-                )
+                self.convert_process["rows_indexes"].append(rows_indexes)
+                self.convert_process["cols_indexes"].append(cols_indexes)
+            self.convert_process["time"].append(time() - start_time)
+            self.convert_process["score"].append(best_ans_score)
+
+        if self.convert_process["time"][-1] < 60:
+            self.convert_process["time"].append(60.0)
+            self.convert_process["score"].append(best_ans_score)
+
         # return the best so far
         return best_ans, best_ans_score

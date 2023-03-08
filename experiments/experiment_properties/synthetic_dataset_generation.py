@@ -115,7 +115,7 @@ class SyntheticDatasetGeneration:
             assoc[index] = 1
         # assoc = [1 for i in range(row_count) if i in rows_indexes]
         assoc[d_tag_index_list[d_tag_size]] = 2
-        d_inf = d
+        d_inf = d.copy()
         d_inf['assoc'] = assoc
 
         # if have path, save it as CSV file

@@ -2,6 +2,7 @@
 import os
 import numpy as np
 import pandas as pd
+from matplotlib import pyplot as plt
 
 # project imports
 from consts import *
@@ -35,7 +36,7 @@ class Main:
             os.makedirs(path, exist_ok=True)
 
         # 2) experiments run #
-        iterations = 10
+        iterations = 2
         best_ans_knn, best_ans_mc = [], []
         ans_knn_shape, ans_mc_shape = [], []
         best_ans_score_knn, best_ans_score_mc = [], []
@@ -64,8 +65,11 @@ class Main:
                                                                         f_diff=f_diff,
                                                                         d_tag_size=d_tag_size,
                                                                         save_csv=os.path.join(RESULTS_FOLDER_PATH,
-                                                                                              "main_synt_example")
+                                                                                              f"main_synt_{iteration}")
                                                                         )
+            # d_inf = pd.read_csv('results/main_synt_example_inf.csv')
+            # dataset = d_inf[[feature for feature in d_inf.columns.values if feature != 'assoc']]
+            # d_tag = dataset.loc[(d_inf['assoc'] == 1) | (d_inf['assoc'] == 2)]
 
             # run experiments
             print(f"run experiment {iteration}")
@@ -93,7 +97,7 @@ class Main:
                                       )
 
             # check results
-            print("check results")
+            # print("check results")
             best_ans_knn.append(synthetic_data_knn_exp.results['best_ans'])
             best_ans_mc.append(synthetic_data_mc_exp.results['best_ans'])
             ans_knn_shape.append(synthetic_data_knn_exp.results['best_ans'].shape)
@@ -102,6 +106,24 @@ class Main:
             best_ans_score_mc.append(synthetic_data_mc_exp.results['best_ans_score'])
             knn_solving_time.append(synthetic_data_knn_exp.results['solving_time'])
             mc_solving_time.append(synthetic_data_mc_exp.results['solving_time'])
+
+            # print convergence
+            # print("print convergence")
+            fig, ax = plt.subplots(figsize=(12, 6))
+            ax.plot(np.array(synthetic_data_knn_exp.convert_process["time"]),
+                    np.array(synthetic_data_knn_exp.convert_process["score"]),
+                    'o-', label='KNN Solver')
+            ax.plot(np.array(synthetic_data_mc_exp.convert_process["time"]),
+                    np.array(synthetic_data_mc_exp.convert_process["score"]),
+                    'o-', label='Monte-Carlo Solver')
+
+            fig.suptitle(f"Solvers Convergence Over Time - Exp{iteration}", fontsize=20)
+            plt.xlabel("Time [sec]", fontsize=16)
+            plt.ylabel("AFEX Score", fontsize=16)
+
+            ax.legend()
+            # plt.show()
+            plt.savefig(os.path.join(RESULTS_FOLDER_PATH, f"convergence_exp{iteration}.jpg"))
 
             # print(synthetic_data_exp.test_results_report())
 

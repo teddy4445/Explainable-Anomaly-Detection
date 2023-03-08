@@ -18,6 +18,7 @@ class Experiment:
     def __init__(self,
                  time_limit_seconds: float):
         self.results = {}
+        self.convert_process = None
         self.baseline = {}
         self._time_limit_seconds = time_limit_seconds
 
@@ -34,14 +35,15 @@ class Experiment:
         """
         solving_start_time = time.perf_counter()
         best_ans, best_ans_score = solver.solve(d=dataset,
-                                    anomaly_algo=anomaly_algo,
-                                    s=anomaly_sample,
-                                    time_limit_seconds=self._time_limit_seconds,
-                                    scorer=scorer)
+                                                anomaly_algo=anomaly_algo,
+                                                s=anomaly_sample,
+                                                time_limit_seconds=self._time_limit_seconds,
+                                                scorer=scorer)
         solving_end_time = time.perf_counter()
         solving_time = solving_end_time - solving_start_time
 
         self.results = {"best_ans": best_ans, "best_ans_score": best_ans_score, "solving_time": solving_time}
+        self.convert_process = solver.convert_process
         self.baseline = {
             "d_tags": d_tags,
             "f_diff_list": f_diff_list

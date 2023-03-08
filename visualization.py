@@ -31,9 +31,10 @@ def scatter_3d(d_inf):
     ax.dist = 10
 
     plt.show()
+    # plt.savefig(os.path.join(RESULTS_FOLDER_PATH, "convergence.jpg"))
 
 
-def scatter_2d(d_inf, method='tsne'):
+def project_2d(d_inf, method='tsne', plot=False):
     # reading the CSV file
     d = d_inf[[feature for feature in d_inf.columns.values if feature != 'assoc']]
     d_tag_c = d.loc[d_inf['assoc'] == 0]
@@ -41,7 +42,7 @@ def scatter_2d(d_inf, method='tsne'):
     anomaly = d.loc[d_inf['assoc'] == 2]
 
     # create the 2D scatter plot
-    fig, ax = plt.subplots()
+    # fig, ax = plt.subplots()
 
     # transform
     if method == "pca":
@@ -51,9 +52,9 @@ def scatter_2d(d_inf, method='tsne'):
         reduced_d_tag = pca.transform(d_tag)
         reduced_anomaly = pca.transform(anomaly)
 
-        ax.scatter(reduced_d_tag_c[:, 0], reduced_d_tag_c[:, 1], c='y', label='D')
-        ax.scatter(reduced_d_tag[:, 0], reduced_d_tag[:, 1], c='r', label='D Tag')
-        ax.scatter(reduced_anomaly[:, 0], reduced_anomaly[:, 1], c='k', label='s')
+        x_dtc, y_dtc = reduced_d_tag_c[:, 0], reduced_d_tag_c[:, 1]
+        x_dt, y_dt = reduced_d_tag[:, 0], reduced_d_tag[:, 1]
+        x_anom, y_anom = reduced_anomaly[:, 0], reduced_anomaly[:, 1]
 
     elif method == "tsne":
         tsne = TSNE(n_components=2, verbose=1, perplexity=40, random_state=0)
@@ -62,20 +63,50 @@ def scatter_2d(d_inf, method='tsne'):
         reduced_d_tag = d_tsne.loc[d_inf['assoc'] == 1]
         reduced_anomaly = d_tsne.loc[d_inf['assoc'] == 2]
 
-        ax.scatter(reduced_d_tag_c[0], reduced_d_tag_c[1], c='y', label='D')
-        ax.scatter(reduced_d_tag[0], reduced_d_tag[1], c='r', label='D Tag')
-        ax.scatter(reduced_anomaly[0], reduced_anomaly[1], c='k', label='s')
+        x_dtc, y_dtc = reduced_d_tag_c[0], reduced_d_tag_c[1]
+        x_dt, y_dt = reduced_d_tag[0], reduced_d_tag[1]
+        x_anom, y_anom = reduced_anomaly[0], reduced_anomaly[1]
 
     else:
-        return
+        return None
+
+    if plot:
+        plt.show()
+    proj_data = {"x_dtc": x_dtc, "y_dtc": y_dtc,
+                 "x_dt": x_dt, "y_dt": y_dt,
+                 "x_anom": x_anom, "y_anom": y_anom}
+    return proj_data
 
 
+def project_fdiff(d_inf, f_diff, method='tsne', plot=True):
+    fig, axs = plt.subplots(1, 2, figsize=(12, 6), constrained_layout=True)
+    fig.suptitle('Dataset Projection', fontsize=20)
+    # axs[0].set_ylabel('AFEX Score')
+    # axs[0].plot(synthetic_data_knn_exp.convert_process["time"],
+    #             synthetic_data_knn_exp.convert_process["score"], '-o')
+    # axs[0].set_title('Solvers Convergence Over Time')
+    # axs[0].set_xlabel('Time [sec]')
+    proj_full = project_2d(d_inf, method=method)
+    axs[0].scatter(proj_full["x_dtc"], proj_full["y_dtc"], c='y', label='D')
+    axs[0].scatter(proj_full["x_dt"], proj_full["y_dt"], c='r', label='D Tag')
+    axs[0].scatter(proj_full["x_anom"], proj_full["y_anom"], c='k', label='s')
+    axs[0].set_xlabel(f'{method} 1', fontsize=12)
+    axs[0].set_ylabel(f'{method} 2', fontsize=12)
+    axs[0].legend()
+    axs[0].set_title(f"D - {method} projection", fontsize=16)
 
-    # ax.set_xlabel('PC 1')
-    # ax.set_ylabel('PC 2')
-    ax.legend()
+    proj_fdiff = project_2d(d_inf[f_diff + ['assoc']], method=method)
+    axs[1].scatter(proj_fdiff["x_dtc"], proj_fdiff["y_dtc"], c='y', label='D')
+    axs[1].scatter(proj_fdiff["x_dt"], proj_fdiff["y_dt"], c='r', label='D Tag')
+    axs[1].scatter(proj_fdiff["x_anom"], proj_fdiff["y_anom"], c='k', label='s')
+    axs[1].set_xlabel(f'{method} 1', fontsize=12)
+    axs[1].set_ylabel(f'{method} 2', fontsize=12)
+    axs[1].legend()
+    axs[1].set_title(f"D[f_diff] - {method} projection", fontsize=16)
 
-    plt.show()
+    if plot:
+        plt.show()
+    return
 
 
 if __name__ == '__main__':
@@ -85,5 +116,4 @@ if __name__ == '__main__':
     d_inf = pd.read_csv(file_name)
 
     # scatter_3d(d_inf)
-    # scatter_2d(d_inf, method='pca')
-    scatter_2d(d_inf, method='tsne')
+    project_fdiff(d_inf, f_diff=['0', '1'], method='tsne', plot=True)

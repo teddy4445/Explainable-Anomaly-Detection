@@ -32,11 +32,11 @@ class KnnSolver(Solver):
         start_time = time()
         # check what is the best solution
         best_ans = None
-        best_ans_score = 99999
+        best_ans_score = 0
         f_diff_size = 1
         # run KNN on the D' for different samples of F_{diff} obtained from F_{diff}
         knn = KNeighborsRegressor(n_neighbors=self._k)
-        knn.fit(d, list(range(d.shape[0])))  # the y is useless so we just put indexes, it can be any value
+        knn.fit(X=d, y=list(range(d.shape[0])))  # the y is useless so we just put indexes, it can be any value
         rows_indexes = knn.kneighbors(X=[s],
                                       n_neighbors=self._k,
                                       return_distance=False)[0]
@@ -50,15 +50,20 @@ class KnnSolver(Solver):
             # score it
             score = scorer.compute_all_features(ans, s)
             # if best so far, replace and record
-            if score < best_ans_score:
+            if score > best_ans_score:
                 best_ans_score = score
                 best_ans = ans
-                self.convert_process.append({
-                    "rows_indexes": rows_indexes,
-                    "cols_indexes": cols_indexes,
-                    "score": score}
-                )
+                self.convert_process["rows_indexes"].append(rows_indexes)
+                self.convert_process["cols_indexes"].append(cols_indexes)
+            self.convert_process["time"].append(time() - start_time)
+            self.convert_process["score"].append(best_ans_score)
+
             # count this try and try larger set
             f_diff_size += 1
-            # return the best so far
+
+        if self.convert_process["time"][-1] < 60:
+            self.convert_process["time"].append(60.0)
+            self.convert_process["score"].append(best_ans_score)
+
+        # return the best so far
         return best_ans, best_ans_score
