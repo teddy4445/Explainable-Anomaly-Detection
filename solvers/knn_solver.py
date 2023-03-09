@@ -48,7 +48,7 @@ class KnnSolver(Solver):
             # obtain the D' with F_{diff}
             ans = d.iloc[rows_indexes, cols_indexes]
             # score it
-            score = scorer.compute_all_features(ans, s)
+            score = scorer.compute_all_features(d=ans, s=s[cols_indexes])
             # if best so far, replace and record
             if score > best_ans_score:
                 best_ans_score = score

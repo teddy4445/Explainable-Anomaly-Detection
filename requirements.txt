@@ -1,7 +1,8 @@
 pandas~=1.5.3
 numpy~=1.23.5
-matplotlib
+matplotlib~=3.6.3
 seaborn
 scikit-learn~=1.2.1
-scipy
+scipy~=1.10.0
 pyod~=1.0.7
+tqdm~=4.65.0

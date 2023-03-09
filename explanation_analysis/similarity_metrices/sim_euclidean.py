@@ -12,6 +12,9 @@ class EuclideanSim(SimMetric):
     Euclidean similarity between a vector and a matrix
     """
 
+    # CONSTS #
+    NAME = "EuclideanSim"
+
     def sim(self,
             d: list | pd.DataFrame,
             s: list | pd.Series,
@@ -20,7 +23,7 @@ class EuclideanSim(SimMetric):
         if isinstance(s, pd.Series):
             s = list(s)
         if isinstance(d, pd.DataFrame):
-            d = list(d.mean(axis=1))
+            d = list(d.mean(axis=0))
         elif isinstance(d, list) and len(d) > 0 and len(d[0]) > 0:
             d = list(np.array(d).mean(0))
         else:

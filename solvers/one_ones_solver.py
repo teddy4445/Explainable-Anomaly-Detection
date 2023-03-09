@@ -65,8 +65,8 @@ class OneOneSolver(Solver):
                 "rows_indexes": rows,
                 "cols_indexes": cols,
                 "score": scorer.compute_all_features(d.iloc[rows, cols],
-                                                     s)}
+                                                     s[cols])}
             )
         # return the best so far
         ans = d.iloc[rows, cols]
-        return ans, scorer.compute_all_features(ans, s)
+        return ans, scorer.compute_all_features(ans, s[cols])

@@ -1,11 +1,13 @@
 # library imports
-import random
 import numpy as np
 import pandas as pd
-from anomaly_detection_algos.anomaly_algo import AnomalyAlgo
+import pickle
+import random
+from tqdm import tqdm
 
 # project imports
 from consts import *
+from explanation_analysis.similarity_metrices.sim_euclidean import EuclideanSim
 from explanation_analysis.similarity_metrices.sim_metric import SimMetric
 from anomaly_detection_algos.DBSCAN import DBSCANwrapper
 from anomaly_detection_algos.anomaly_algo import AnomalyAlgo
@@ -120,7 +122,7 @@ class SyntheticDatasetGeneration:
 
         # if have path, save it as CSV file
         if save_csv is not None and isinstance(save_csv, str) and os.path.exists(os.path.dirname(save_csv)):
-            d.to_csv(save_csv + ".csv", index=False)
+            # d.to_csv(save_csv + ".csv", index=False)
             d_inf.to_csv(save_csv + "_inf.csv", index=False)
 
         return d, d_tag, d_inf
@@ -148,24 +150,50 @@ if __name__ == '__main__':
         os.makedirs(path, exist_ok=True)
 
     # 2) generate dataset
-    iterations = 1
+    iterations = 50
+    features_num = 5
+    row_count = 50
 
-    for iteration in range(iterations):
-        print(f"generate dataset {iteration}")
-        f_diff = [0, 1]
-        d_tag_size = 10
+    f_diff = [0, 1]  # could vary
+    d_tag_size = 10
+    anom_algo_name = DBSCANwrapper.NAME
+    performance_metric = None  # EuclideanSim()
+    performance_metric_name = None  # performance_metric.NAME
+    performance_metric_attempts = 0  # 2
+
+    meta_data = {"iterations": iterations,
+                 "features_num": features_num,
+                 "row_count": row_count,
+                 "f_diff": f_diff,
+                 "d_tag_size": d_tag_size,
+                 "anom_algo_name": anom_algo_name,
+                 "performance_metric_name": performance_metric_name,
+                 "performance_metric_attempts": performance_metric_attempts,
+                 "cols_dist": {}}
+    folder_path = os.path.join(DATA_FOLDER_PATH, f"{DBSCANwrapper.NAME}_rc{row_count}_pm{performance_metric_name}")
+    os.makedirs(folder_path, exist_ok=True)
+
+    for iteration in tqdm(range(iterations)):
+        # print(f"generate dataset {iteration}")
+
+        cols_dist_functions = {}
+        for feature in range(features_num):
+            mean = random.uniform(0, 1)
+            std = random.uniform(0, 1)
+            cols_dist_functions[feature] = FeatureDistributionNormal(mean=mean, std=std)
+        meta_data["cols_dist"][f"iter{iteration}"] = cols_dist_functions
+
         dataset, d_tag, d_inf = SyntheticDatasetGeneration.generate_one(
             anomaly_detection_algorithm=DBSCANwrapper(),
-            row_count=50,
-            cols_dist_functions={
-                "a": FeatureDistributionNormal(mean=1,
-                                               std=0.5),
-                "b": FeatureDistributionNormal(mean=0.8,
-                                               std=0.7),
-                "c": FeatureDistributionNormal(mean=5, std=1)
-            },
+            row_count=row_count,
+            cols_dist_functions=cols_dist_functions,
             f_diff=f_diff,
             d_tag_size=d_tag_size,
-            save_csv=os.path.join(RESULTS_FOLDER_PATH,
-                                  f"synt_example_iter{iteration}")
+            performance_metric=performance_metric,
+            performance_metric_attempts=performance_metric_attempts,
+            save_csv=os.path.join(folder_path, f"synt_iter{iteration}")
         )
+
+    # save dictionary to person_data.pkl file
+    with open(os.path.join(folder_path, "meta_data.pkl"), 'wb') as fp:
+        pickle.dump(meta_data, fp)

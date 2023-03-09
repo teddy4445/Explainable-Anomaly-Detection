@@ -9,6 +9,8 @@ class FeatureDistributionNormal(FeatureDistribution):
     """
     A class responsible for a normally dist. feature
     """
+    # CONSTS #
+    NAME = "Normal"
 
     def __init__(self,
                  mean: float,
