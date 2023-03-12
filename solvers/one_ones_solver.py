@@ -33,7 +33,7 @@ class OneOneSolver(Solver):
         rows = []
         cols = []
         # run until the time is over
-        for row_index in range(self.d_tag_size + self.f_diff_size):
+        for index in range(self.d_tag_size + self.f_diff_size):
             # just to break over time
             if (time() - start_time) > time_limit_seconds:
                 break
@@ -43,8 +43,7 @@ class OneOneSolver(Solver):
                 for row_index, row in d.iterrows():
                     this_rows = rows.copy()
                     this_rows.append(row_index)
-                    score = scorer.compute_all_features(d.iloc[rows, cols],
-                                                        s)
+                    score = scorer.compute_all_features(d.iloc[rows, cols], s[cols])
                     if best_row_score < score:
                         best_row_score = score
                         best_row_index = row_index
@@ -55,8 +54,7 @@ class OneOneSolver(Solver):
                 for col_index in range(d.shape[1]):
                     this_rows = cols.copy()
                     this_rows.append(col_index)
-                    score = scorer.compute_all_features(d.iloc[rows, cols],
-                                                        s)
+                    score = scorer.compute_all_features(d.iloc[rows, cols], s[cols])
                     if best_col_score < score:
                         best_col_score = score
                         best_col_index = row_index
@@ -64,8 +62,7 @@ class OneOneSolver(Solver):
             self.convert_process.append({
                 "rows_indexes": rows,
                 "cols_indexes": cols,
-                "score": scorer.compute_all_features(d.iloc[rows, cols],
-                                                     s[cols])}
+                "score": scorer.compute_all_features(d.iloc[rows, cols], s[cols])}
             )
         # return the best so far
         ans = d.iloc[rows, cols]

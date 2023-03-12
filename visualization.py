@@ -1,7 +1,11 @@
-import pandas as pd
 import matplotlib.pyplot as plt
+import os
+import pandas as pd
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
+
+# project imports
+from consts import *
 
 
 def scatter_3d(d_inf):
@@ -78,7 +82,10 @@ def project_2d(d_inf, method='tsne', plot=False):
     return proj_data
 
 
-def project_fdiff(d_inf, f_diff, method='tsne', plot=True):
+def project_fdiff(file_name, f_diff, method='tsne', plot=True, save=False):
+    # reading the CSV file
+    d_inf = pd.read_csv(file_name)
+
     fig, axs = plt.subplots(1, 2, figsize=(12, 6), constrained_layout=True)
     fig.suptitle('Dataset Projection', fontsize=20)
     # axs[0].set_ylabel('AFEX Score')
@@ -106,14 +113,16 @@ def project_fdiff(d_inf, f_diff, method='tsne', plot=True):
 
     if plot:
         plt.show()
+    if save:
+        plt.savefig(os.path.join(RESULTS_FOLDER_PATH, "Projections", f"{os.path.basename(file_name)}_proj.png"))
     return
 
 
 if __name__ == '__main__':
-    file_name = 'results/synt_example_iter0_inf.csv'
+    file_name = 'data/DBSCAN_rc50_pmNone/synt_iter9_inf.csv'
 
     # reading the CSV file
-    d_inf = pd.read_csv(file_name)
+    # d_inf = pd.read_csv(file_name)
 
     # scatter_3d(d_inf)
-    project_fdiff(d_inf, f_diff=['0', '1'], method='tsne', plot=True)
+    project_fdiff(file_name, f_diff=['0', '1'], method='tsne', plot=False, save=True)
