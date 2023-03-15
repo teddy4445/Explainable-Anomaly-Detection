@@ -1,16 +1,14 @@
 # library imports
+import random
 import numpy as np
 import pandas as pd
-import pickle
-import random
-from tqdm import tqdm
 
 # project imports
 from consts import *
-from explanation_analysis.similarity_metrices.sim_euclidean import EuclideanSim
-from explanation_analysis.similarity_metrices.sim_metric import SimMetric
 from anomaly_detection_algos.DBSCAN import DBSCANwrapper
 from anomaly_detection_algos.anomaly_algo import AnomalyAlgo
+from explanation_analysis.similarity_metrices.sim_metric import SimMetric
+from explanation_analysis.similarity_metrices.sim_euclidean import EuclideanSim
 from experiments.experiment_properties.feature_distribution_normal import FeatureDistributionNormal
 
 

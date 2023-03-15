@@ -6,22 +6,19 @@ import pandas as pd
 import pickle
 import random
 from tqdm import tqdm
+from memory_profiler import profile
 
 # project imports
 from consts import *
-from anomaly_detection_algos.z_score import Zscore
-from anomaly_detection_algos.DBSCAN import DBSCANwrapper
-from explanation_analysis.afes.afes_sum import AfesSum
-from explanation_analysis.similarity_metrices.sim_cosine import CosineSim
-from explanation_analysis.similarity_metrices.sim_euclidean import EuclideanSim
-from explanation_analysis.similarity_metrices.sim_mean_entropy import MeanEntropySim
-from explanation_analysis.similarity_metrices.sim_prob import ProbSim
-from experiments.experiment import Experiment
-from experiments.experiment_properties.feature_distribution_normal import FeatureDistributionNormal
-from experiments.experiment_properties.synthetic_dataset_generation import SyntheticDatasetGeneration
+from plotter import Plotter
 from solvers.knn_solver import KnnSolver
+from experiments.experiment import Experiment
 from solvers.mc_solver import MonteCarloSolver
-from solvers.one_ones_solver import OneOneSolver
+from explanation_analysis.afes.afes_sum import AfesSum
+from anomaly_detection_algos.DBSCAN import DBSCANwrapper
+from explanation_analysis.similarity_metrices.sim_euclidean import EuclideanSim
+from experiments.experiment_properties.feature_distribution_normal import FeatureDistributionNormal
+from experiments.synthetic_dataset_generation import SyntheticDatasetGeneration
 
 
 class Main:
@@ -32,12 +29,24 @@ class Main:
     def __init__(self):
         pass
 
+    @profile
     @staticmethod
-    def run(create_corpus=False, iterations=50, features_num=5, row_count=50, f_diff=[0, 1], d_tag_size=10,
-            run_experiments=True, corpus_name="DBSCAN_rc50_pmNone"):
+    def run(create_corpus: bool = False,
+            run_experiments: bool = True,
+            iterations: int = 50,
+            features_num: int = 5,
+            row_count: int = 50,
+            f_diff: list = None,
+            d_tag_size: int = 10,
+            time_limit_seconds: int = 300,
+            corpus_name: str = "DBSCAN_rc50_pmNone"):
         """
-        Single entry point
+        Single entry point - running all the experiments logic
         """
+
+        # 0) default value setting
+        if f_diff is None or not isinstance(f_diff, list):
+            f_diff = [0, 1]
 
         # 1) prepare IO
         for path in SETUP_FOLDERS:
@@ -89,11 +98,10 @@ class Main:
                 pickle.dump(meta_data, fp)
 
         # 3) run experiments
-        elif run_experiments:
+        if run_experiments:
             results_path = os.path.join(RESULTS_FOLDER_PATH, corpus_name)
-            os.makedirs(results_path, exist_ok=True)
-
-            d_tag_size = 10
+            os.makedirs(results_path,
+                        exist_ok=True)
 
             # Set-up experiment
             print(f"Set-up experiment")
@@ -101,23 +109,23 @@ class Main:
             # ans_knn_shape = []
             # best_ans_score_knn = []
             # knn_solving_time = []
-            print()
 
             # run experiments
             print(f"run experiments")
+            dict_main_key = 'assoc'  # the key for the dict of the meta-data, declare once so will be the same everywhere
             for filename in tqdm(os.scandir(os.path.join(DATA_FOLDER_PATH, corpus_name))):
                 if filename.is_file():
                     d_inf = pd.read_csv(filename)
-                    dataset = d_inf[[feature for feature in d_inf.columns.values if feature != 'assoc']]
-                    d_tag = dataset.loc[(d_inf['assoc'] == 1) | (d_inf['assoc'] == 2)]
-                    anomaly_sample = dataset.loc[d_inf['assoc'] == 2].iloc[-1]
+                    dataset = d_inf[[feature for feature in d_inf.columns.values if feature != dict_main_key]]
+                    d_tag = dataset.loc[(d_inf[dict_main_key] == 1) | (d_inf[dict_main_key] == 2)]
+                    anomaly_sample = dataset.loc[d_inf[dict_main_key] == 2].iloc[-1]
 
-                    knn_exp = Experiment(time_limit_seconds=60)
+                    knn_exp = Experiment(time_limit_seconds=time_limit_seconds)
                     knn_exp.run(anomaly_algo=DBSCANwrapper(),
                                 solver=KnnSolver(),
                                 scorer=AfesSum(sim_module=EuclideanSim(), w_gsim=1, w_ldiff=1, w_lsim=1),
                                 d_tags=[d_tag], f_diff_list=[f_diff], anomaly_sample=anomaly_sample, dataset=dataset)
-                    mc_exp = Experiment(time_limit_seconds=60)
+                    mc_exp = Experiment(time_limit_seconds=time_limit_seconds)
                     mc_exp.run(anomaly_algo=DBSCANwrapper(),
                                solver=MonteCarloSolver(),
                                scorer=AfesSum(sim_module=EuclideanSim(), w_gsim=1, w_ldiff=1, w_lsim=1),
@@ -137,6 +145,11 @@ class Main:
                     # knn_solving_time.append(knn_exp.results['solving_time'])
 
                     # print convergence
+                    print("print convergence")
+                    Plotter.solver_converge(exp_dict_list=[knn_exp, mc_exp],
+                                            exp_names=["KNN", "MC"],
+                                            save_path=os.path.join(results_path, f"{os.path.basename(filename).split('.')[0]}_conv.png"))
+
                     print("print score convergence")
                     fig, ax = plt.subplots(figsize=(12, 6))
                     ax.plot(np.array(mc_exp.convert_process["time"]), np.array(mc_exp.convert_process["score"]),
