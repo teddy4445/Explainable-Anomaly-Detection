@@ -2,8 +2,6 @@
 from __future__ import annotations
 import numpy as np
 import pandas as pd
-from scipy.stats import entropy
-from collections import Counter
 
 # project imports
 from explanation_analysis.similarity_metrices.sim_metric import SimMetric
@@ -11,7 +9,8 @@ from explanation_analysis.similarity_metrices.sim_metric import SimMetric
 
 class MeanEntropySim(SimMetric):
     """
-    The mean entropy distance between a vector and a matrix
+    The mean entropy distance between a vector and a matrix.
+    Note: this metric is assuming the data is probelities and won't work eitherwise
     """
 
     def sim(self,

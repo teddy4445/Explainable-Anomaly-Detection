@@ -11,8 +11,9 @@ class Solver:
     An abstract class for the project's solver classes
     """
 
-    def __init__(self):
-        self._param = None
+    def __init__(self,
+                 param: dict = None):
+        self._param = param if param is not None else {}
         self.convert_process = {
             "time": [],
             "rows_indexes": [],
