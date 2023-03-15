@@ -16,12 +16,15 @@ class KnnSolver(Solver):
     """
 
     def __init__(self,
-                 k: int = 3):
-        Solver.__init__(self)
-        if isinstance(k, int) and k > 0:
-            self._k = k
+                 param: dict = None):
+        if param is None:
+            param = {"k": 3}
+        Solver.__init__(self,
+                        param=param)
+        if isinstance(param["k"], int) and param["k"] > 0:
+            self._k = param["k"]
         else:
-            raise Exception("KnnSovler.__init__ error saying that 'k' is possitive integer")
+            raise Exception("KnnSovler.__init__ error saying that 'k' is positive integer")
 
     def solve(self,
               anomaly_algo: AnomalyAlgo,

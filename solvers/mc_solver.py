@@ -14,8 +14,10 @@ class MonteCarloSolver(Solver):
     A Monte Carlo approach for the rows (D') and columns (F_{diff})
     """
 
-    def __init__(self):
-        Solver.__init__(self)
+    def __init__(self,
+                 param: dict = None):
+        Solver.__init__(self,
+                        param=param)
 
     def solve(self,
               d: pd.DataFrame,

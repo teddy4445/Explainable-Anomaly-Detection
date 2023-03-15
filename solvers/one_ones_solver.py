@@ -15,11 +15,11 @@ class OneOneSolver(Solver):
     """
 
     def __init__(self,
-                 d_tag_size: int,
-                 f_diff_size: int):
-        Solver.__init__(self)
-        self.d_tag_size = d_tag_size
-        self.f_diff_size = f_diff_size
+                 param: dict = None):
+        Solver.__init__(self,
+                        param=param)
+        self.d_tag_size = param["d_tag_size"]
+        self.f_diff_size = param["f_diff_size"]
 
     def solve(self,
               d: pd.DataFrame,
@@ -57,7 +57,7 @@ class OneOneSolver(Solver):
                     score = scorer.compute_all_features(d.iloc[rows, cols], s[cols])
                     if best_col_score < score:
                         best_col_score = score
-                        best_col_index = row_index
+                        best_col_index = col_index
                 cols.append(best_col_index)
             self.convert_process.append({
                 "rows_indexes": rows,

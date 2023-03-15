@@ -79,7 +79,7 @@ class Main:
                     cols_dist_functions[feature] = FeatureDistributionNormal(mean=mean, std=std)
                 meta_data["cols_dist"][f"iter{iteration}"] = cols_dist_functions
 
-                dataset, d_tag, d_inf = SyntheticDatasetGeneration.generate_one(
+                SyntheticDatasetGeneration.generate_one(
                     anomaly_detection_algorithm=DBSCANwrapper(),
                     row_count=row_count,
                     cols_dist_functions=cols_dist_functions,
