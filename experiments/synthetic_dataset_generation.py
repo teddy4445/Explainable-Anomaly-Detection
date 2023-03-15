@@ -1,16 +1,14 @@
 # library imports
+import random
 import numpy as np
 import pandas as pd
-import pickle
-import random
-from tqdm import tqdm
 
 # project imports
 from consts import *
-from explanation_analysis.similarity_metrices.sim_euclidean import EuclideanSim
-from explanation_analysis.similarity_metrices.sim_metric import SimMetric
 from anomaly_detection_algos.DBSCAN import DBSCANwrapper
 from anomaly_detection_algos.anomaly_algo import AnomalyAlgo
+from explanation_analysis.similarity_metrices.sim_metric import SimMetric
+from explanation_analysis.similarity_metrices.sim_euclidean import EuclideanSim
 from experiments.experiment_properties.feature_distribution_normal import FeatureDistributionNormal
 
 
@@ -142,9 +140,3 @@ class SyntheticDatasetGeneration:
                                                         f_diff=f_diff,
                                                         save_csv=save_csvs[index])
                 for index in range(count)]
-
-
-if __name__ == '__main__':
-    # 1) prepare IO
-    for path in SETUP_FOLDERS:
-        os.makedirs(path, exist_ok=True)

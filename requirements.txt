@@ -6,3 +6,4 @@ scikit-learn~=1.2.1
 scipy~=1.10.0
 pyod~=1.0.7
 tqdm~=4.65.0
+memory-profiler==0.61.0

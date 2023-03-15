@@ -1,27 +1,21 @@
 # library imports
-from matplotlib import pyplot as plt
-import numpy as np
-import os
-import pandas as pd
 import pickle
 import random
+import pandas as pd
 from tqdm import tqdm
+from memory_profiler import profile
 
 # project imports
 from consts import *
-from anomaly_detection_algos.z_score import Zscore
-from anomaly_detection_algos.DBSCAN import DBSCANwrapper
-from explanation_analysis.afes.afes_sum import AfesSum
-from explanation_analysis.similarity_metrices.sim_cosine import CosineSim
-from explanation_analysis.similarity_metrices.sim_euclidean import EuclideanSim
-from explanation_analysis.similarity_metrices.sim_mean_entropy import MeanEntropySim
-from explanation_analysis.similarity_metrices.sim_prob import ProbSim
-from experiments.experiment import Experiment
-from experiments.experiment_properties.feature_distribution_normal import FeatureDistributionNormal
-from experiments.experiment_properties.synthetic_dataset_generation import SyntheticDatasetGeneration
+from plotter import Plotter
 from solvers.knn_solver import KnnSolver
+from experiments.experiment import Experiment
 from solvers.mc_solver import MonteCarloSolver
-from solvers.one_ones_solver import OneOneSolver
+from explanation_analysis.afes.afes_sum import AfesSum
+from anomaly_detection_algos.DBSCAN import DBSCANwrapper
+from explanation_analysis.similarity_metrices.sim_euclidean import EuclideanSim
+from experiments.experiment_properties.feature_distribution_normal import FeatureDistributionNormal
+from experiments.synthetic_dataset_generation import SyntheticDatasetGeneration
 
 
 class Main:
@@ -32,6 +26,7 @@ class Main:
     def __init__(self):
         pass
 
+    @profile
     @staticmethod
     def run(create_corpus: bool = False,
             run_experiments: bool = True,
@@ -148,28 +143,9 @@ class Main:
 
                     # print convergence
                     print("print convergence")
-                    fig, ax = plt.subplots(figsize=(12, 6))
-                    ax.plot(np.array(knn_exp.convert_process["time"]),
-                            np.array(knn_exp.convert_process["score"]),
-                            'o-',
-                            label='KNN Solver')
-                    ax.plot(np.array(mc_exp.convert_process["time"]),
-                            np.array(mc_exp.convert_process["score"]),
-                            'o-',
-                            label='Monte-Carlo Solver')
-                    # ax.plot(np.array(obo_exp.convert_process["time"]), np.array(obo_exp.convert_process["score"]),
-                    #         'o-', label='1-by-1 Solver')
-
-                    fig.suptitle(f"Solvers Convergence Over Time",
-                                 fontsize=20)
-                    plt.xlabel("Time [sec]",
-                               fontsize=16)
-                    plt.ylabel("AFEX Score",
-                               fontsize=16)
-
-                    ax.legend()
-                    plt.savefig(os.path.join(results_path, f"{os.path.basename(filename).split('.')[0]}_conv.png"))
-                    # plt.show()
+                    Plotter.solver_converge(exp_dict_list=[knn_exp, mc_exp],
+                                            exp_names=["KNN", "MC"],
+                                            save_path=os.path.join(results_path, f"{os.path.basename(filename).split('.')[0]}_conv.png"))
 
             # 4) Save experiments metadata
             # analysis_df = pd.DataFrame({'best_ans_score_knn': best_ans_score_knn, 'best_ans_score_mc': best_ans_score_mc,
