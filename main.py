@@ -33,11 +33,22 @@ class Main:
         pass
 
     @staticmethod
-    def run(create_corpus=False, iterations=50, features_num=5, row_count=50, f_diff=[0, 1], d_tag_size=10,
-            run_experiments=True, corpus_name="DBSCAN_rc50_pmNone"):
+    def run(create_corpus: bool = False,
+            run_experiments: bool = True,
+            iterations: int = 50,
+            features_num: int = 5,
+            row_count: int = 50,
+            f_diff: list = None,
+            d_tag_size: int = 10,
+            time_limit_seconds: int = 300,
+            corpus_name: str = "DBSCAN_rc50_pmNone"):
         """
-        Single entry point
+        Single entry point - running all the experiments logic
         """
+
+        # 0) default value setting
+        if f_diff is None or not isinstance(f_diff, list):
+            f_diff = [0, 1]
 
         # 1) prepare IO
         for path in SETUP_FOLDERS:
@@ -89,11 +100,10 @@ class Main:
                 pickle.dump(meta_data, fp)
 
         # 3) run experiments
-        elif run_experiments:
+        if run_experiments:
             results_path = os.path.join(RESULTS_FOLDER_PATH, corpus_name)
-            os.makedirs(results_path, exist_ok=True)
-
-            d_tag_size = 10
+            os.makedirs(results_path,
+                        exist_ok=True)
 
             # Set-up experiment
             print(f"Set-up experiment")
@@ -101,23 +111,23 @@ class Main:
             # ans_knn_shape = []
             # best_ans_score_knn = []
             # knn_solving_time = []
-            print()
 
             # run experiments
             print(f"run experiments")
+            dict_main_key = 'assoc'  # the key for the dict of the meta-data, declare once so will be the same everywhere
             for filename in tqdm(os.scandir(os.path.join(DATA_FOLDER_PATH, corpus_name))):
                 if filename.is_file():
                     d_inf = pd.read_csv(filename)
-                    dataset = d_inf[[feature for feature in d_inf.columns.values if feature != 'assoc']]
-                    d_tag = dataset.loc[(d_inf['assoc'] == 1) | (d_inf['assoc'] == 2)]
-                    anomaly_sample = dataset.loc[d_inf['assoc'] == 2].iloc[-1]
+                    dataset = d_inf[[feature for feature in d_inf.columns.values if feature != dict_main_key]]
+                    d_tag = dataset.loc[(d_inf[dict_main_key] == 1) | (d_inf[dict_main_key] == 2)]
+                    anomaly_sample = dataset.loc[d_inf[dict_main_key] == 2].iloc[-1]
 
-                    knn_exp = Experiment(time_limit_seconds=60)
+                    knn_exp = Experiment(time_limit_seconds=time_limit_seconds)
                     knn_exp.run(anomaly_algo=DBSCANwrapper(),
                                 solver=KnnSolver(),
                                 scorer=AfesSum(sim_module=EuclideanSim(), w_gsim=1, w_ldiff=1, w_lsim=1),
                                 d_tags=[d_tag], f_diff_list=[f_diff], anomaly_sample=anomaly_sample, dataset=dataset)
-                    mc_exp = Experiment(time_limit_seconds=60)
+                    mc_exp = Experiment(time_limit_seconds=time_limit_seconds)
                     mc_exp.run(anomaly_algo=DBSCANwrapper(),
                                solver=MonteCarloSolver(),
                                scorer=AfesSum(sim_module=EuclideanSim(), w_gsim=1, w_ldiff=1, w_lsim=1),
@@ -139,16 +149,23 @@ class Main:
                     # print convergence
                     print("print convergence")
                     fig, ax = plt.subplots(figsize=(12, 6))
-                    ax.plot(np.array(knn_exp.convert_process["time"]), np.array(knn_exp.convert_process["score"]),
-                            'o-', label='KNN Solver')
-                    ax.plot(np.array(mc_exp.convert_process["time"]), np.array(mc_exp.convert_process["score"]),
-                            'o-', label='Monte-Carlo Solver')
+                    ax.plot(np.array(knn_exp.convert_process["time"]),
+                            np.array(knn_exp.convert_process["score"]),
+                            'o-',
+                            label='KNN Solver')
+                    ax.plot(np.array(mc_exp.convert_process["time"]),
+                            np.array(mc_exp.convert_process["score"]),
+                            'o-',
+                            label='Monte-Carlo Solver')
                     # ax.plot(np.array(obo_exp.convert_process["time"]), np.array(obo_exp.convert_process["score"]),
                     #         'o-', label='1-by-1 Solver')
 
-                    fig.suptitle(f"Solvers Convergence Over Time", fontsize=20)
-                    plt.xlabel("Time [sec]", fontsize=16)
-                    plt.ylabel("AFEX Score", fontsize=16)
+                    fig.suptitle(f"Solvers Convergence Over Time",
+                                 fontsize=20)
+                    plt.xlabel("Time [sec]",
+                               fontsize=16)
+                    plt.ylabel("AFEX Score",
+                               fontsize=16)
 
                     ax.legend()
                     plt.savefig(os.path.join(results_path, f"{os.path.basename(filename).split('.')[0]}_conv.png"))
