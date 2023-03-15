@@ -17,6 +17,7 @@ class Solver:
             "time": [],
             "rows_indexes": [],
             "cols_indexes": [],
+            "shape": [],
             "score": []
         }
 

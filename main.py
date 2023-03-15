@@ -137,12 +137,12 @@ class Main:
                     # knn_solving_time.append(knn_exp.results['solving_time'])
 
                     # print convergence
-                    print("print convergence")
+                    print("print score convergence")
                     fig, ax = plt.subplots(figsize=(12, 6))
-                    ax.plot(np.array(knn_exp.convert_process["time"]), np.array(knn_exp.convert_process["score"]),
-                            'o-', label='KNN Solver')
                     ax.plot(np.array(mc_exp.convert_process["time"]), np.array(mc_exp.convert_process["score"]),
                             'o-', label='Monte-Carlo Solver')
+                    ax.plot(np.array(knn_exp.convert_process["time"]), np.array(knn_exp.convert_process["score"]),
+                            'o-', label='KNN Solver')
                     # ax.plot(np.array(obo_exp.convert_process["time"]), np.array(obo_exp.convert_process["score"]),
                     #         'o-', label='1-by-1 Solver')
 
@@ -151,8 +151,27 @@ class Main:
                     plt.ylabel("AFEX Score", fontsize=16)
 
                     ax.legend()
-                    plt.savefig(os.path.join(results_path, f"{os.path.basename(filename).split('.')[0]}_conv.png"))
-                    # plt.show()
+                    # plt.savefig(os.path.join(results_path, f"{os.path.basename(filename).split('.')[0]}_conv.png"))
+                    plt.show()
+
+                    print("print shape convergence")
+                    fig, ax = plt.subplots(figsize=(12, 6))
+                    ax.plot(np.array(mc_exp.convert_process["shape"])[:, 0],
+                            np.array(mc_exp.convert_process["shape"])[:, 1],
+                            'o-', label='Monte-Carlo Solver')
+                    ax.plot(np.array(knn_exp.convert_process["shape"])[:, 0],
+                            np.array(knn_exp.convert_process["shape"])[:, 1],
+                            'o-', label='KNN Solver')
+                    # ax.plot(np.array(obo_exp.convert_process["time"]), np.array(obo_exp.convert_process["score"]),
+                    #         'o-', label='1-by-1 Solver')
+
+                    fig.suptitle(f"Solvers Convergence Over Time - Shape", fontsize=20)
+                    plt.xlabel("Num of Rows", fontsize=16)
+                    plt.ylabel("Num of Columns", fontsize=16)
+
+                    ax.legend()
+                    # plt.savefig(os.path.join(results_path, f"{os.path.basename(filename).split('.')[0]}_shape-conv.png"))
+                    plt.show()
 
             # 4) Save experiments metadata
             # analysis_df = pd.DataFrame({'best_ans_score_knn': best_ans_score_knn, 'best_ans_score_mc': best_ans_score_mc,

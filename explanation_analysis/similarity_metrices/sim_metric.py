@@ -11,6 +11,5 @@ class SimMetric:
     def sim(self,
             d: list | pd.DataFrame,
             s: list | pd.pd.Series,
-            f_sim: list,
-            f_diff: list):
+            features: list):
         pass

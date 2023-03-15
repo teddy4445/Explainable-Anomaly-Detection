@@ -41,7 +41,7 @@ class OneOneSolver(Solver):
                 best_row_index = 0
                 best_row_score = 0
                 for row_index, row in d.iterrows():
-                    this_rows = rows.copy()
+                    this_rows = rows.copy()  # why?
                     this_rows.append(row_index)
                     score = scorer.compute_all_features(d.iloc[rows, cols], s[cols])
                     if best_row_score < score:

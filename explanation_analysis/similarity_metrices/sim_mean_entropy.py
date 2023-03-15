@@ -17,11 +17,9 @@ class MeanEntropySim(SimMetric):
     def sim(self,
             d: list | pd.DataFrame,
             s: list | pd.Series,
-            f_sim: list,
-            f_diff: list):
+            features: list):
         if isinstance(s, pd.Series):
-            s = list(s)
-            s = np.array(s)
+            s = s[features].values
         elif isinstance(s, list):
             s = np.array(s)
         else:
@@ -34,8 +32,6 @@ class MeanEntropySim(SimMetric):
             raise ValueError("The argument 'd' must be either a non-empty 2-dim list or a pd.DataFrame")
 
         # at this stage both 's' and 'd' are lists
-        s = np.array(s)
-
         ans = 0
         counter = 0
         for row_index, row in d.iterrows():

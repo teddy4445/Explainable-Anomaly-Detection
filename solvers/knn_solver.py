@@ -29,6 +29,7 @@ class KnnSolver(Solver):
               s: list,
               time_limit_seconds: int,
               scorer: AfesMetric) -> tuple:
+        features = d.columns.values
         start_time = time()
         # check what is the best solution
         best_ans = None
@@ -46,16 +47,19 @@ class KnnSolver(Solver):
         while ((time() - start_time) < time_limit_seconds or best_ans is None) and (f_diff_size < d.shape[1]):
             cols_indexes = (-f_diff_dist_vector).argsort()[:f_diff_size]
             # obtain the D' with F_{diff}
-            ans = d.iloc[rows_indexes, cols_indexes]
+            ans = d.iloc[rows_indexes]
             # score it
-            score = scorer.compute_all_features(d=ans, s=s[cols_indexes])
+            score = scorer.compute(d=ans, s=s, f_sim=cols_indexes,
+                                   f_diff=[feature for feature in features if feature not in cols_indexes])
             # if best so far, replace and record
             if score > best_ans_score:
                 best_ans_score = score
                 best_ans = ans
-                self.convert_process["rows_indexes"].append(rows_indexes)
-                self.convert_process["cols_indexes"].append(cols_indexes)
+
             self.convert_process["time"].append(time() - start_time)
+            self.convert_process["rows_indexes"].append(rows_indexes)
+            self.convert_process["cols_indexes"].append(cols_indexes)
+            self.convert_process["shape"].append([len(rows_indexes), len(cols_indexes)])
             self.convert_process["score"].append(best_ans_score)
 
             # count this try and try larger set
@@ -63,6 +67,9 @@ class KnnSolver(Solver):
 
         if self.convert_process["time"][-1] < 60:
             self.convert_process["time"].append(60.0)
+            self.convert_process["rows_indexes"].append(self.convert_process["rows_indexes"][-1])
+            self.convert_process["cols_indexes"].append(self.convert_process["cols_indexes"][-1])
+            self.convert_process["shape"].append(self.convert_process["shape"][-1])
             self.convert_process["score"].append(best_ans_score)
 
         # return the best so far

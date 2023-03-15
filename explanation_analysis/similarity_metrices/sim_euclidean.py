@@ -18,14 +18,13 @@ class EuclideanSim(SimMetric):
     def sim(self,
             d: list | pd.DataFrame,
             s: list | pd.Series,
-            f_sim: list,
-            f_diff: list):
+            features: list):
         if isinstance(s, pd.Series):
-            s = list(s)
+            s = s[features].values
         if isinstance(d, pd.DataFrame):
-            d = list(d.mean(axis=0))
+            d = d.mean(axis=0)[features].values
         elif isinstance(d, list) and len(d) > 0 and len(d[0]) > 0:
-            d = list(np.array(d).mean(0))
+            d = np.array(d[features]).mean(0)
         else:
             raise ValueError("The argument 'd' must be either a 2-dim list or a pd.DataFrame")
 

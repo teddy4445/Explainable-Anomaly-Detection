@@ -142,9 +142,3 @@ class SyntheticDatasetGeneration:
                                                         f_diff=f_diff,
                                                         save_csv=save_csvs[index])
                 for index in range(count)]
-
-
-if __name__ == '__main__':
-    # 1) prepare IO
-    for path in SETUP_FOLDERS:
-        os.makedirs(path, exist_ok=True)
