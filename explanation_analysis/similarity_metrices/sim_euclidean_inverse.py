@@ -7,13 +7,13 @@ import pandas as pd
 from explanation_analysis.similarity_metrices.sim_metric import SimMetric
 
 
-class EuclideanSim(SimMetric):
+class InverseEuclideanSim(SimMetric):
     """
-    Euclidean similarity between a vector and a matrix
+    Inverse Euclidean similarity between a vector and a matrix
     """
 
     # CONSTS #
-    NAME = "EuclideanSim"
+    NAME = "InverseEuclideanSim"
 
     def sim(self,
             d: list | pd.DataFrame,
@@ -29,4 +29,4 @@ class EuclideanSim(SimMetric):
             raise ValueError("The argument 'd' must be either a 2-dim list or a pd.DataFrame")
 
         # at this stage both 's' and 'd' are lists
-        return - np.linalg.norm(np.array(d) - np.array(s))
+        return 1 / (1 + np.linalg.norm(np.array(d) - np.array(s)))

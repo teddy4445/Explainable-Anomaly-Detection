@@ -28,7 +28,7 @@ class AfesSum(AfesMetric):
                 s: list,
                 f_sim: list,
                 f_diff: list):
-        global_sim = self._w_gsim * sum(
+        global_sim = self._w_gsim * 1/len(d) * sum(
             self.sim_module.sim(d=d, s=row, features=d.columns.values) for index, row in d.iterrows())
         local_sim = self._w_lsim * self.sim_module.sim(d=d, s=s, features=f_sim)
         local_diff = self._w_ldiff * self.sim_module.sim(d=d, s=s, features=f_diff)
@@ -37,7 +37,7 @@ class AfesSum(AfesMetric):
     def compute_all_features(self,
                              d: pd.DataFrame,
                              s: list):
-        global_sim = self._w_gsim * sum(
+        global_sim = self._w_gsim * 1/len(d) * sum(
             self.sim_module.sim(d=d, s=row, features=d.columns.values) for index, row in d.iterrows())  # list(range(d.shape[1]))
         local_sim = self._w_lsim * self.sim_module.sim(d=d, s=s, features=d.columns.values)  # list(range(d.shape[1]))
         local_diff = self._w_ldiff * self.sim_module.sim(d=d, s=s, features=d.columns.values)  # list(range(d.shape[1]))

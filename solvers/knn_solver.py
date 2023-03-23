@@ -36,7 +36,7 @@ class KnnSolver(Solver):
         start_time = time()
         # check what is the best solution
         best_ans = None
-        best_ans_score = 0
+        best_ans_score = -99999999
         f_diff_size = 1
         # run KNN on the D' for different samples of F_{diff} obtained from F_{diff}
         knn = KNeighborsRegressor(n_neighbors=self._k)
@@ -75,5 +75,8 @@ class KnnSolver(Solver):
             self.convert_process["shape"].append(self.convert_process["shape"][-1])
             self.convert_process["score"].append(best_ans_score)
 
+        assoc = np.zeros(len(d), dtype=int)
+        assoc[rows_indexes] = 1
+
         # return the best so far
-        return best_ans, best_ans_score
+        return best_ans, best_ans_score, list(assoc)

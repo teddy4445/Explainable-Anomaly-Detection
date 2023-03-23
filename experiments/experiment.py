@@ -34,15 +34,23 @@ class Experiment:
         This method runs an algorithm on the experiment_properties's data and stores the results needed for this experiment_properties
         """
         solving_start_time = time.perf_counter()
-        best_ans, best_ans_score = solver.solve(d=dataset,
-                                                anomaly_algo=anomaly_algo,
-                                                s=anomaly_sample,
-                                                time_limit_seconds=self._time_limit_seconds,
-                                                scorer=scorer)
+        best_ans, best_ans_score, assoc = solver.solve(d=dataset,
+                                                       anomaly_algo=anomaly_algo,
+                                                       s=anomaly_sample,
+                                                       time_limit_seconds=self._time_limit_seconds,
+                                                       scorer=scorer)
         solving_end_time = time.perf_counter()
         solving_time = solving_end_time - solving_start_time
 
-        self.results = {"best_ans": best_ans, "best_ans_score": best_ans_score, "solving_time": solving_time}
+        # d_inf = dataset.copy()
+        d_inf = pd.concat([dataset, pd.DataFrame(anomaly_sample).T], ignore_index=True)
+        assoc.append(2)
+        d_inf['assoc'] = assoc
+
+        self.results = {"best_ans": best_ans,
+                        "d_inf": d_inf,
+                        "best_ans_score": best_ans_score,
+                        "solving_time": solving_time}
         self.convert_process = solver.convert_process
         self.baseline = {
             "d_tags": d_tags,

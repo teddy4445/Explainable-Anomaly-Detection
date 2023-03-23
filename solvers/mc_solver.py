@@ -1,5 +1,6 @@
 # library imports
 import random
+import numpy as np
 import pandas as pd
 from time import time
 
@@ -29,7 +30,7 @@ class MonteCarloSolver(Solver):
         start_time = time()
         # check what is the best solution
         best_ans = None
-        best_ans_score = 0
+        best_ans_score = -99999999
         # run until the time is over
         while (time() - start_time) < time_limit_seconds or best_ans is None:
             # pick number of rows
@@ -45,7 +46,7 @@ class MonteCarloSolver(Solver):
             random.shuffle(cols_indexes)
             cols_indexes = cols_indexes[:col_count]
             # obtain the D' with F_{diff}
-            ans = d.iloc[rows_indexes]
+            ans = d.loc[rows_indexes]
             # score it
             score = scorer.compute(d=ans, s=s, f_sim=cols_indexes,
                                    f_diff=[feature for feature in features if feature not in cols_indexes])
@@ -67,5 +68,8 @@ class MonteCarloSolver(Solver):
             self.convert_process["shape"].append(self.convert_process["shape"][-1])
             self.convert_process["score"].append(best_ans_score)
 
+        assoc = np.zeros(len(d), dtype=int)
+        assoc[rows_indexes] = 1
+
         # return the best so far
-        return best_ans, best_ans_score
+        return best_ans, best_ans_score, list(assoc)
