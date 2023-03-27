@@ -119,10 +119,11 @@ def project_fdiff(file_name, f_diff, method='tsne', plot=True, save=False):
 
 
 if __name__ == '__main__':
-    file_name = 'data/DBSCAN_rc50_pmNone/synt_iter9_inf.csv'
+    file_name = 'data/DBSCAN_rc50_pmNone/synt_iter7_inf.csv'
 
     # reading the CSV file
-    # d_inf = pd.read_csv(file_name)
+    d_inf = pd.read_csv(file_name)
 
     # scatter_3d(d_inf)
-    project_fdiff(file_name, f_diff=['0', '1'], method='tsne', plot=False, save=True)
+    f_diff = ['0', '1', '2', '3', '4']
+    project_fdiff(file_name, f_diff=f_diff, method='tsne', plot=True, save=False)

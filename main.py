@@ -20,9 +20,6 @@ from solvers.mc_solver import MonteCarloSolver
 from solvers.one_ones_solver import OneOneSolver
 from explanation_analysis.afes.afes_sum import AfesSum
 from explanation_analysis.similarity_metrices.sim_euclidean import EuclideanSim
-from explanation_analysis.similarity_metrices.sim_euclidean_inverse import InverseEuclideanSim
-
-
 class Main:
     """
     The main class of the project, allow other developers to run all the experiments in the paper
@@ -40,7 +37,7 @@ class Main:
             row_count: int = 50,
             f_diff: list = None,
             d_tag_size: int = 10,
-            time_limit_seconds: int = 300,
+            time_limit_seconds: int = 120,
             corpus_name: str = "DBSCAN_rc50_pmNone"):
         """
         Single entry point - running all the experiments logic
@@ -107,6 +104,7 @@ class Main:
 
             # Set-up experiment
             print(f"Set-up experiment")
+            file_names = []
             # best_ans_knn, ans_knn_shape, best_ans_score_knn, knn_solving_time = [], [], [], []
             best_ans_knn5, ans_knn5_shape, best_ans_score_knn5, knn5_solving_time = [], [], [], []
             best_ans_knn10, ans_knn10_shape, best_ans_score_knn10, knn10_solving_time = [], [], [], []
@@ -120,6 +118,7 @@ class Main:
             for filename in tqdm(os.scandir(os.path.join(DATA_FOLDER_PATH, corpus_name))):
                 print(filename)
                 if filename.is_file():
+                    file_names.append(os.path.basename(filename).split('.')[0])
                     d_inf = pd.read_csv(filename)
                     dataset = d_inf[[feature for feature in d_inf.columns.values if feature != dict_main_key]]
                     d_tag = dataset.loc[(d_inf[dict_main_key] == 1) | (d_inf[dict_main_key] == 2)]
@@ -130,33 +129,33 @@ class Main:
                     knn5_exp = Experiment(time_limit_seconds=time_limit_seconds)
                     knn5_exp.run(anomaly_algo=DBSCANwrapper(),
                                  solver=KnnSolver(param={"k": 5}),
-                                 scorer=AfesSum(sim_module=InverseEuclideanSim(), w_gsim=1, w_ldiff=1, w_lsim=1),
+                                 scorer=AfesSum(sim_module=EuclideanSim(), w_gsim=1, w_ldiff=1, w_lsim=1),
                                  d_tags=[d_tag], f_diff_list=[f_diff], anomaly_sample=anomaly_sample,
                                  dataset=dataset_wo_anomaly)
                     knn10_exp = Experiment(time_limit_seconds=time_limit_seconds)
                     knn10_exp.run(anomaly_algo=DBSCANwrapper(),
                                   solver=KnnSolver(param={"k": 10}),
-                                  scorer=AfesSum(sim_module=InverseEuclideanSim(), w_gsim=1, w_ldiff=1, w_lsim=1),
+                                  scorer=AfesSum(sim_module=EuclideanSim(), w_gsim=1, w_ldiff=1, w_lsim=1),
                                   d_tags=[d_tag], f_diff_list=[f_diff], anomaly_sample=anomaly_sample,
                                   dataset=dataset_wo_anomaly)
                     knn15_exp = Experiment(time_limit_seconds=time_limit_seconds)
                     knn15_exp.run(anomaly_algo=DBSCANwrapper(),
                                   solver=KnnSolver(param={"k": 15}),
-                                  scorer=AfesSum(sim_module=InverseEuclideanSim(), w_gsim=1, w_ldiff=1, w_lsim=1),
+                                  scorer=AfesSum(sim_module=EuclideanSim(), w_gsim=1, w_ldiff=1, w_lsim=1),
                                   d_tags=[d_tag], f_diff_list=[f_diff], anomaly_sample=anomaly_sample,
                                   dataset=dataset_wo_anomaly)
                     print('mc')
                     mc_exp = Experiment(time_limit_seconds=time_limit_seconds)
                     mc_exp.run(anomaly_algo=DBSCANwrapper(),
                                solver=MonteCarloSolver(),
-                               scorer=AfesSum(sim_module=InverseEuclideanSim(), w_gsim=1, w_ldiff=1, w_lsim=1),
+                               scorer=AfesSum(sim_module=EuclideanSim(), w_gsim=1, w_ldiff=1, w_lsim=1),
                                d_tags=[d_tag], f_diff_list=[f_diff], anomaly_sample=anomaly_sample,
                                dataset=dataset_wo_anomaly)
                     print('obo')
                     obo_exp = Experiment(time_limit_seconds=time_limit_seconds)
                     obo_exp.run(anomaly_algo=DBSCANwrapper(),
                                 solver=OneOneSolver(param={"d_tag_size": d_tag_size, "f_diff_size": len(f_diff)}),
-                                scorer=AfesSum(sim_module=InverseEuclideanSim(), w_gsim=1, w_ldiff=1, w_lsim=1),
+                                scorer=AfesSum(sim_module=EuclideanSim(), w_gsim=1, w_ldiff=1, w_lsim=1),
                                 d_tags=[d_tag], f_diff_list=[f_diff], anomaly_sample=anomaly_sample,
                                 dataset=dataset_wo_anomaly)
                     print()
@@ -164,7 +163,7 @@ class Main:
                     # check results
                     print("check results")
                     best_ans_knn5.append(knn5_exp.results['best_ans'])
-                    ans_knn5_shape.append(knn5_exp.results['best_ans'].shape)
+                    # ans_knn5_shape.append(knn5_exp.results['best_ans'].shape)
                     best_ans_score_knn5.append(knn5_exp.results['best_ans_score'])
                     knn5_solving_time.append(knn5_exp.results['solving_time'])
                     knn5_exp.results['d_inf'].to_csv(os.path.join(results_path,
@@ -172,7 +171,7 @@ class Main:
                                                                   f"_knn5_inf.csv"), index=False)
 
                     best_ans_knn10.append(knn10_exp.results['best_ans'])
-                    ans_knn10_shape.append(knn10_exp.results['best_ans'].shape)
+                    # ans_knn10_shape.append(knn10_exp.results['best_ans'].shape)
                     best_ans_score_knn10.append(knn10_exp.results['best_ans_score'])
                     knn10_solving_time.append(knn10_exp.results['solving_time'])
                     knn10_exp.results['d_inf'].to_csv(os.path.join(results_path,
@@ -180,7 +179,7 @@ class Main:
                                                                    f"_knn10_inf.csv"), index=False)
 
                     best_ans_knn15.append(knn15_exp.results['best_ans'])
-                    ans_knn15_shape.append(knn15_exp.results['best_ans'].shape)
+                    # ans_knn15_shape.append(knn15_exp.results['best_ans'].shape)
                     best_ans_score_knn15.append(knn15_exp.results['best_ans_score'])
                     knn15_solving_time.append(knn15_exp.results['solving_time'])
                     knn15_exp.results['d_inf'].to_csv(os.path.join(results_path,
@@ -188,7 +187,7 @@ class Main:
                                                                    f"_knn15_inf.csv"), index=False)
 
                     best_ans_mc.append(mc_exp.results['best_ans'])
-                    ans_mc_shape.append(mc_exp.results['best_ans'].shape)
+                    # ans_mc_shape.append(mc_exp.results['best_ans'].shape)
                     best_ans_score_mc.append(mc_exp.results['best_ans_score'])
                     mc_solving_time.append(mc_exp.results['solving_time'])
                     mc_exp.results['d_inf'].to_csv(os.path.join(results_path,
@@ -196,7 +195,7 @@ class Main:
                                                                 f"_mc_inf.csv"), index=False)
 
                     best_ans_obo.append(obo_exp.results['best_ans'])
-                    ans_obo_shape.append(obo_exp.results['best_ans'].shape)
+                    # ans_obo_shape.append(obo_exp.results['best_ans'].shape)
                     best_ans_score_obo.append(obo_exp.results['best_ans_score'])
                     obo_solving_time.append(obo_exp.results['solving_time'])
                     obo_exp.results['d_inf'].to_csv(os.path.join(results_path,
@@ -229,18 +228,25 @@ class Main:
                                                                   f"_shape_conv.png"))
 
                     print()
+                    # break
 
             # 4) Save experiments metadata
-            analysis_df = pd.DataFrame({'best_ans_score_knn5': best_ans_score_knn5,
-                                        'best_ans_score_knn5': best_ans_score_knn10,
-                                        'best_ans_score_knn5': best_ans_score_knn15,
-                                        'best_ans_score_mc': best_ans_score_mc,
-                                        'best_ans_score_obo': best_ans_score_obo,
-                                        'ans_knn5_shape': ans_knn5_shape[-1],
-                                        'ans_knn10_shape': ans_knn10_shape[-1],
-                                        'ans_knn15_shape': ans_knn15_shape[-1],
-                                        'ans_mc_shape': ans_mc_shape[-1],
-                                        'ans_obo_shape': ans_mc_shape[-1],
+            analysis_df = pd.DataFrame({'dataset': file_names,
+                                        'knn5_score': best_ans_score_knn5,
+                                        'knn10_score': best_ans_score_knn10,
+                                        'knn15_score': best_ans_score_knn15,
+                                        'mc_score': best_ans_score_mc,
+                                        'obo_score': best_ans_score_obo,
+                                        'knn5_features': [ans.columns.values for ans in best_ans_knn5],
+                                        'knn10_features': [ans.columns.values for ans in best_ans_knn10],
+                                        'knn15_features': [ans.columns.values for ans in best_ans_knn15],
+                                        'mc_features': [ans.columns.values for ans in best_ans_mc],
+                                        'obo_features': [ans.columns.values for ans in best_ans_obo],
+                                        'knn5_shape': [ans.shape for ans in best_ans_knn5],
+                                        'knn10_shape': [ans.shape for ans in best_ans_knn10],
+                                        'knn15_shape': [ans.shape for ans in best_ans_knn15],
+                                        'mc_shape': [ans.shape for ans in best_ans_mc],
+                                        'obo_shape': [ans.shape for ans in best_ans_obo],
                                         'knn5_solving_time': knn5_solving_time,
                                         'knn10_solving_time': knn10_solving_time,
                                         'knn15_solving_time': knn15_solving_time,
@@ -255,7 +261,7 @@ class Main:
             #                             'knn_solving_time': knn_solving_time,
             #                             'mc_solving_time': mc_solving_time,
             #                             'obo_solving_time': obo_solving_time})
-            analysis_df.to_csv(os.path.join(results_path, "meta_analysis.csv"), index=False)
+            analysis_df.T.to_csv(os.path.join(results_path, "meta_analysis.csv"), index=True)
 
 
 if __name__ == '__main__':
@@ -268,3 +274,6 @@ if __name__ == '__main__':
              d_tag_size=10,
              time_limit_seconds=300,
              corpus_name="DBSCAN_rc50_pmNone")
+
+
+from explanation_analysis.similarity_metrices.sim_euclidean_inverse import InverseEuclideanSim
