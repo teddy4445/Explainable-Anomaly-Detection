@@ -22,7 +22,9 @@ class AfesMetric:
                 f_diff: list):
         pass
 
-    def compute_all_features(self,
-                             d: pd.DataFrame,
-                             s: list):
+    def compute_parts(self,
+                      d: pd.DataFrame,
+                      s: list,
+                      f_sim: list,
+                      f_diff: list):
         pass

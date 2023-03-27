@@ -8,6 +8,10 @@ from sklearn.manifold import TSNE
 from consts import *
 
 
+def scale_df(df):
+    return (df - df.min()) / (df.max() - df.min())
+
+
 def scatter_3d(d_inf):
     d = d_inf[[feature for feature in d_inf.columns.values if feature != 'assoc']]
     d_tag_c = d.loc[d_inf['assoc'] == 0]
@@ -63,6 +67,7 @@ def project_2d(d_inf, method='tsne', plot=False):
     elif method == "tsne":
         tsne = TSNE(n_components=2, verbose=1, perplexity=40, random_state=0)
         d_tsne = pd.DataFrame(tsne.fit_transform(d))
+        d_tsne = scale_df(d_tsne)
         reduced_d_tag_c = d_tsne.loc[d_inf['assoc'] == 0]
         reduced_d_tag = d_tsne.loc[d_inf['assoc'] == 1]
         reduced_anomaly = d_tsne.loc[d_inf['assoc'] == 2]
@@ -86,7 +91,7 @@ def project_fdiff(file_name, f_diff, method='tsne', plot=True, save=False):
     # reading the CSV file
     d_inf = pd.read_csv(file_name)
 
-    fig, axs = plt.subplots(1, 2, figsize=(12, 6), constrained_layout=True)
+    fig, axs = plt.subplots(1, 3, figsize=(12, 6), constrained_layout=True)
     fig.suptitle('Dataset Projection', fontsize=20)
     # axs[0].set_ylabel('AFEX Score')
     # axs[0].plot(synthetic_data_knn_exp.convert_process["time"],
@@ -102,14 +107,24 @@ def project_fdiff(file_name, f_diff, method='tsne', plot=True, save=False):
     axs[0].legend()
     axs[0].set_title(f"D - {method} projection", fontsize=16)
 
-    proj_fdiff = project_2d(d_inf[f_diff + ['assoc']], method=method)
-    axs[1].scatter(proj_fdiff["x_dtc"], proj_fdiff["y_dtc"], c='y', label='D')
-    axs[1].scatter(proj_fdiff["x_dt"], proj_fdiff["y_dt"], c='r', label='D Tag')
-    axs[1].scatter(proj_fdiff["x_anom"], proj_fdiff["y_anom"], c='k', label='s')
+    proj_fsim = project_2d(d_inf[[f for f in d_inf.columns.values if f not in f_diff]], method=method)
+    axs[1].scatter(proj_fsim["x_dtc"], proj_fsim["y_dtc"], c='y', label='D')
+    axs[1].scatter(proj_fsim["x_dt"], proj_fsim["y_dt"], c='r', label='D Tag')
+    axs[1].scatter(proj_fsim["x_anom"], proj_fsim["y_anom"], c='k', label='s')
     axs[1].set_xlabel(f'{method} 1', fontsize=12)
     axs[1].set_ylabel(f'{method} 2', fontsize=12)
     axs[1].legend()
-    axs[1].set_title(f"D[f_diff] - {method} projection", fontsize=16)
+    axs[1].set_title(f"D[f_sim] = D{[f for f in d_inf.columns.values if f not in f_diff + ['assoc']]} "
+                     f"- {method} projection", fontsize=16)
+
+    proj_fdiff = project_2d(d_inf[f_diff + ['assoc']], method=method)
+    axs[2].scatter(proj_fdiff["x_dtc"], proj_fdiff["y_dtc"], c='y', label='D')
+    axs[2].scatter(proj_fdiff["x_dt"], proj_fdiff["y_dt"], c='r', label='D Tag')
+    axs[2].scatter(proj_fdiff["x_anom"], proj_fdiff["y_anom"], c='k', label='s')
+    axs[2].set_xlabel(f'{method} 1', fontsize=12)
+    axs[2].set_ylabel(f'{method} 2', fontsize=12)
+    axs[2].legend()
+    axs[2].set_title(f"D[f_diff] = D{f_diff} - {method} projection", fontsize=16)
 
     if plot:
         plt.show()
@@ -119,11 +134,11 @@ def project_fdiff(file_name, f_diff, method='tsne', plot=True, save=False):
 
 
 if __name__ == '__main__':
-    file_name = 'data/DBSCAN_rc50_pmNone/synt_iter7_inf.csv'
+    file_name = 'data/DBSCAN_rc50_pmNone/synt_iter6_inf.csv'
 
     # reading the CSV file
     d_inf = pd.read_csv(file_name)
 
     # scatter_3d(d_inf)
-    f_diff = ['0', '1', '2', '3', '4']
+    f_diff = ['0', '1']
     project_fdiff(file_name, f_diff=f_diff, method='tsne', plot=True, save=False)

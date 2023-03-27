@@ -28,17 +28,16 @@ class AfesSum(AfesMetric):
                 s: list,
                 f_sim: list,
                 f_diff: list):
-        global_sim = self._w_gsim * 1/len(d) * sum(
+        global_sim, local_sim, local_diff = self.compute_parts(d=d, s=s, f_sim=f_sim, f_diff=f_diff)
+        return global_sim + local_sim - local_diff
+
+    def compute_parts(self,
+                      d: pd.DataFrame,
+                      s: list,
+                      f_sim: list,
+                      f_diff: list):
+        global_sim = self._w_gsim * 1 / len(d) * sum(
             self.sim_module.sim(d=d, s=row, features=d.columns.values) for index, row in d.iterrows())
         local_sim = self._w_lsim * self.sim_module.sim(d=d, s=s, features=f_sim)
         local_diff = self._w_ldiff * self.sim_module.sim(d=d, s=s, features=f_diff)
-        return global_sim + local_sim - local_diff
-
-    def compute_all_features(self,
-                             d: pd.DataFrame,
-                             s: list):
-        global_sim = self._w_gsim * 1/len(d) * sum(
-            self.sim_module.sim(d=d, s=row, features=d.columns.values) for index, row in d.iterrows())  # list(range(d.shape[1]))
-        local_sim = self._w_lsim * self.sim_module.sim(d=d, s=s, features=d.columns.values)  # list(range(d.shape[1]))
-        local_diff = self._w_ldiff * self.sim_module.sim(d=d, s=s, features=d.columns.values)  # list(range(d.shape[1]))
-        return global_sim + local_sim - local_diff
+        return global_sim, local_sim, local_diff
