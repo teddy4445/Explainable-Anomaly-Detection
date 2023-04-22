@@ -20,6 +20,8 @@ from solvers.mc_solver import MonteCarloSolver
 from solvers.one_ones_solver import OneOneSolver
 from explanation_analysis.afes.afes_sum import AfesSum
 from explanation_analysis.similarity_metrices.sim_euclidean import EuclideanSim
+
+
 class Main:
     """
     The main class of the project, allow other developers to run all the experiments in the paper
@@ -106,11 +108,29 @@ class Main:
             print(f"Set-up experiment")
             file_names = []
             # best_ans_knn, ans_knn_shape, best_ans_score_knn, knn_solving_time = [], [], [], []
-            best_ans_knn5, ans_knn5_shape, best_ans_score_knn5, knn5_solving_time = [], [], [], []
-            best_ans_knn10, ans_knn10_shape, best_ans_score_knn10, knn10_solving_time = [], [], [], []
-            best_ans_knn15, ans_knn15_shape, best_ans_score_knn15, knn15_solving_time = [], [], [], []
-            best_ans_mc, ans_mc_shape, best_ans_score_mc, mc_solving_time = [], [], [], []
-            best_ans_obo, ans_obo_shape, best_ans_score_obo, obo_solving_time = [], [], [], []
+
+            exp_dict = {'knn5': {'solver': KnnSolver, 'params': {"k": 5}},
+                        'knn10': {'solver': KnnSolver, 'params': {"k": 10}},
+                        'knn15': {'solver': KnnSolver, 'params': {"k": 15}},
+                        'mc': {'solver': MonteCarloSolver, 'params': {}},
+                        'obo': {'solver': OneOneSolver,
+                                'params': {"d_tag_size": d_tag_size, "f_diff_size": len(f_diff)}}
+                        }
+            for exp_name, exp_data in exp_dict.items():
+                exp_dict[exp_name]['ans'] = []
+                exp_dict[exp_name]['shape'] = []
+                exp_dict[exp_name]['ans_score'] = []
+                exp_dict[exp_name]['global_sim'] = []
+                exp_dict[exp_name]['local_sim'] = []
+                exp_dict[exp_name]['local_diff'] = []
+                exp_dict[exp_name]['solving_time'] = []
+
+            # ans_knn5, ans_knn5_shape, best_ans_score_knn5, knn5_solving_time = [], [], [], []
+            # ans_knn10, ans_knn10_shape, best_ans_score_knn10, knn10_solving_time = [], [], [], []
+            # ans_knn15, ans_knn15_shape, best_ans_score_knn15, knn15_solving_time = [], [], [], []
+            # ans_mc, ans_mc_shape, best_ans_score_mc, mc_solving_time = [], [], [], []
+            # ans_obo, ans_obo_shape, best_ans_score_obo, obo_solving_time = [], [], [], []
+            print()
 
             # run experiments
             print(f"run experiments")
@@ -125,133 +145,196 @@ class Main:
                     anomaly_sample = dataset.loc[d_inf[dict_main_key] == 2].iloc[-1]
                     dataset_wo_anomaly = dataset.loc[d_inf[dict_main_key] != 2].reset_index(drop=True)
 
-                    print('knn')
-                    knn5_exp = Experiment(time_limit_seconds=time_limit_seconds)
-                    knn5_exp.run(anomaly_algo=DBSCANwrapper(),
-                                 solver=KnnSolver(param={"k": 5}),
-                                 scorer=AfesSum(sim_module=EuclideanSim(), w_gsim=1, w_ldiff=1, w_lsim=1),
-                                 d_tags=[d_tag], f_diff_list=[f_diff], anomaly_sample=anomaly_sample,
-                                 dataset=dataset_wo_anomaly)
-                    knn10_exp = Experiment(time_limit_seconds=time_limit_seconds)
-                    knn10_exp.run(anomaly_algo=DBSCANwrapper(),
-                                  solver=KnnSolver(param={"k": 10}),
-                                  scorer=AfesSum(sim_module=EuclideanSim(), w_gsim=1, w_ldiff=1, w_lsim=1),
-                                  d_tags=[d_tag], f_diff_list=[f_diff], anomaly_sample=anomaly_sample,
-                                  dataset=dataset_wo_anomaly)
-                    knn15_exp = Experiment(time_limit_seconds=time_limit_seconds)
-                    knn15_exp.run(anomaly_algo=DBSCANwrapper(),
-                                  solver=KnnSolver(param={"k": 15}),
-                                  scorer=AfesSum(sim_module=EuclideanSim(), w_gsim=1, w_ldiff=1, w_lsim=1),
-                                  d_tags=[d_tag], f_diff_list=[f_diff], anomaly_sample=anomaly_sample,
-                                  dataset=dataset_wo_anomaly)
-                    print('mc')
-                    mc_exp = Experiment(time_limit_seconds=time_limit_seconds)
-                    mc_exp.run(anomaly_algo=DBSCANwrapper(),
-                               solver=MonteCarloSolver(),
-                               scorer=AfesSum(sim_module=EuclideanSim(), w_gsim=1, w_ldiff=1, w_lsim=1),
-                               d_tags=[d_tag], f_diff_list=[f_diff], anomaly_sample=anomaly_sample,
-                               dataset=dataset_wo_anomaly)
-                    print('obo')
-                    obo_exp = Experiment(time_limit_seconds=time_limit_seconds)
-                    obo_exp.run(anomaly_algo=DBSCANwrapper(),
-                                solver=OneOneSolver(param={"d_tag_size": d_tag_size, "f_diff_size": len(f_diff)}),
-                                scorer=AfesSum(sim_module=EuclideanSim(), w_gsim=1, w_ldiff=1, w_lsim=1),
-                                d_tags=[d_tag], f_diff_list=[f_diff], anomaly_sample=anomaly_sample,
-                                dataset=dataset_wo_anomaly)
-                    print()
+                    exp_dict_list = []
+                    exp_names = []
+                    for exp_name, exp_data in exp_dict.items():
+                        curr_exp = Experiment(time_limit_seconds=time_limit_seconds)
+                        curr_exp.run(anomaly_algo=DBSCANwrapper(),
+                                     solver=exp_data['solver'](param=exp_data['params']),
+                                     scorer=AfesSum(sim_module=EuclideanSim(), w_gsim=1, w_ldiff=1, w_lsim=1),
+                                     d_tags=[d_tag], f_diff_list=[f_diff], anomaly_sample=anomaly_sample,
+                                     dataset=dataset_wo_anomaly)
+                        exp_dict[exp_name]['exp'] = curr_exp
 
-                    # check results
-                    print("check results")
-                    best_ans_knn5.append(knn5_exp.results['best_ans'])
-                    # ans_knn5_shape.append(knn5_exp.results['best_ans'].shape)
-                    best_ans_score_knn5.append(knn5_exp.results['best_ans_score'])
-                    knn5_solving_time.append(knn5_exp.results['solving_time'])
-                    knn5_exp.results['d_inf'].to_csv(os.path.join(results_path,
-                                                                  f"{os.path.basename(filename).split('.')[0]}"
-                                                                  f"_knn5_inf.csv"), index=False)
+                        # check results
+                        print("check results")
+                        exp_dict[exp_name]['ans'].append(curr_exp.results['best_ans'])
+                        exp_dict[exp_name]['shape'].append(curr_exp.results['best_ans'].shape)
+                        exp_dict[exp_name]['ans_score'].append(curr_exp.results['best_ans_score'])
+                        exp_dict[exp_name]['solving_time'].append(curr_exp.results['solving_time'])
+                        # curr_exp.results['d_inf'].to_csv(os.path.join(results_path,
+                        #                                               f"{os.path.basename(filename).split('.')[0]}"
+                        #                                               f"_{exp_name}_inf.csv"), index=False)
 
-                    best_ans_knn10.append(knn10_exp.results['best_ans'])
-                    # ans_knn10_shape.append(knn10_exp.results['best_ans'].shape)
-                    best_ans_score_knn10.append(knn10_exp.results['best_ans_score'])
-                    knn10_solving_time.append(knn10_exp.results['solving_time'])
-                    knn10_exp.results['d_inf'].to_csv(os.path.join(results_path,
-                                                                   f"{os.path.basename(filename).split('.')[0]}"
-                                                                   f"_knn10_inf.csv"), index=False)
-
-                    best_ans_knn15.append(knn15_exp.results['best_ans'])
-                    # ans_knn15_shape.append(knn15_exp.results['best_ans'].shape)
-                    best_ans_score_knn15.append(knn15_exp.results['best_ans_score'])
-                    knn15_solving_time.append(knn15_exp.results['solving_time'])
-                    knn15_exp.results['d_inf'].to_csv(os.path.join(results_path,
-                                                                   f"{os.path.basename(filename).split('.')[0]}"
-                                                                   f"_knn15_inf.csv"), index=False)
-
-                    best_ans_mc.append(mc_exp.results['best_ans'])
-                    # ans_mc_shape.append(mc_exp.results['best_ans'].shape)
-                    best_ans_score_mc.append(mc_exp.results['best_ans_score'])
-                    mc_solving_time.append(mc_exp.results['solving_time'])
-                    mc_exp.results['d_inf'].to_csv(os.path.join(results_path,
-                                                                f"{os.path.basename(filename).split('.')[0]}"
-                                                                f"_mc_inf.csv"), index=False)
-
-                    best_ans_obo.append(obo_exp.results['best_ans'])
-                    # ans_obo_shape.append(obo_exp.results['best_ans'].shape)
-                    best_ans_score_obo.append(obo_exp.results['best_ans_score'])
-                    obo_solving_time.append(obo_exp.results['solving_time'])
-                    obo_exp.results['d_inf'].to_csv(os.path.join(results_path,
-                                                                 f"{os.path.basename(filename).split('.')[0]}"
-                                                                 f"_obo_inf.csv"), index=False)
+                        exp_dict_list.append(exp_dict[exp_name]['exp'])
+                        exp_names.append(exp_name)
 
                     # print convergence
                     print("print score convergence")
-                    # Plotter.score_converge(exp_dict_list=[knn_exp, mc_exp, obo_exp],
-                    #                        exp_names=["KNN", "MC", "OBO"],
+                    # Plotter.score_converge(exp_dict_list=exp_dict_list,
+                    #                        exp_names=exp_names,
                     #                        save_path=os.path.join(results_path,
                     #                                               f"{os.path.basename(filename).split('.')[0]}"
                     #                                               f"_score_conv.png"))
-                    Plotter.score_converge(exp_dict_list=[knn5_exp, knn10_exp, knn15_exp, mc_exp, obo_exp],
-                                           exp_names=["KNN5", "KNN10", "KNN15", "MC", "OBO"],
-                                           save_path=os.path.join(results_path,
-                                                                  f"{os.path.basename(filename).split('.')[0]}"
-                                                                  f"_score_conv.png"))
-
-                    print("print shape convergence")
-                    # Plotter.shape_converge(exp_dict_list=[knn_exp, mc_exp, obo_exp],
-                    #                        exp_names=["KNN", "MC", "OBO"],
+                    #
+                    # print("print shape convergence")
+                    # Plotter.shape_converge(exp_dict_list=exp_dict_list,
+                    #                        exp_names=exp_names,
                     #                        save_path=os.path.join(results_path,
                     #                                               f"{os.path.basename(filename).split('.')[0]}"
                     #                                               f"_shape_conv.png"))
-                    Plotter.shape_converge(exp_dict_list=[knn5_exp, knn10_exp, knn15_exp, mc_exp, obo_exp],
-                                           exp_names=["KNN5", "KNN10", "KNN15", "MC", "OBO"],
-                                           save_path=os.path.join(results_path,
-                                                                  f"{os.path.basename(filename).split('.')[0]}"
-                                                                  f"_shape_conv.png"))
+
+                    print()
+
+                    # print('knn')
+                    # knn5_exp = Experiment(time_limit_seconds=time_limit_seconds)
+                    # knn5_exp.run(anomaly_algo=DBSCANwrapper(),
+                    #              solver=KnnSolver(param={"k": 5}),
+                    #              scorer=AfesSum(sim_module=EuclideanSim(), w_gsim=1, w_ldiff=1, w_lsim=1),
+                    #              d_tags=[d_tag], f_diff_list=[f_diff], anomaly_sample=anomaly_sample,
+                    #              dataset=dataset_wo_anomaly)
+                    # knn10_exp = Experiment(time_limit_seconds=time_limit_seconds)
+                    # knn10_exp.run(anomaly_algo=DBSCANwrapper(),
+                    #               solver=KnnSolver(param={"k": 10}),
+                    #               scorer=AfesSum(sim_module=EuclideanSim(), w_gsim=1, w_ldiff=1, w_lsim=1),
+                    #               d_tags=[d_tag], f_diff_list=[f_diff], anomaly_sample=anomaly_sample,
+                    #               dataset=dataset_wo_anomaly)
+                    # knn15_exp = Experiment(time_limit_seconds=time_limit_seconds)
+                    # knn15_exp.run(anomaly_algo=DBSCANwrapper(),
+                    #               solver=KnnSolver(param={"k": 15}),
+                    #               scorer=AfesSum(sim_module=EuclideanSim(), w_gsim=1, w_ldiff=1, w_lsim=1),
+                    #               d_tags=[d_tag], f_diff_list=[f_diff], anomaly_sample=anomaly_sample,
+                    #               dataset=dataset_wo_anomaly)
+                    # print('mc')
+                    # mc_exp = Experiment(time_limit_seconds=time_limit_seconds)
+                    # mc_exp.run(anomaly_algo=DBSCANwrapper(),
+                    #            solver=MonteCarloSolver(),
+                    #            scorer=AfesSum(sim_module=EuclideanSim(), w_gsim=1, w_ldiff=1, w_lsim=1),
+                    #            d_tags=[d_tag], f_diff_list=[f_diff], anomaly_sample=anomaly_sample,
+                    #            dataset=dataset_wo_anomaly)
+                    # print('obo')
+                    # obo_exp = Experiment(time_limit_seconds=time_limit_seconds)
+                    # obo_exp.run(anomaly_algo=DBSCANwrapper(),
+                    #             solver=OneOneSolver(param={"d_tag_size": d_tag_size, "f_diff_size": len(f_diff)}),
+                    #             scorer=AfesSum(sim_module=EuclideanSim(), w_gsim=1, w_ldiff=1, w_lsim=1),
+                    #             d_tags=[d_tag], f_diff_list=[f_diff], anomaly_sample=anomaly_sample,
+                    #             dataset=dataset_wo_anomaly)
+                    # print()
+
+                    # # check results
+                    # print("check results")
+                    # ans_knn5.append(knn5_exp.results['best_ans'])
+                    # # ans_knn5_shape.append(knn5_exp.results['best_ans'].shape)
+                    # best_ans_score_knn5.append(knn5_exp.results['best_ans_score'])
+                    # knn5_solving_time.append(knn5_exp.results['solving_time'])
+                    # knn5_exp.results['d_inf'].to_csv(os.path.join(results_path,
+                    #                                               f"{os.path.basename(filename).split('.')[0]}"
+                    #                                               f"_knn5_inf.csv"), index=False)
+                    #
+                    # ans_knn10.append(knn10_exp.results['best_ans'])
+                    # # ans_knn10_shape.append(knn10_exp.results['best_ans'].shape)
+                    # best_ans_score_knn10.append(knn10_exp.results['best_ans_score'])
+                    # knn10_solving_time.append(knn10_exp.results['solving_time'])
+                    # knn10_exp.results['d_inf'].to_csv(os.path.join(results_path,
+                    #                                                f"{os.path.basename(filename).split('.')[0]}"
+                    #                                                f"_knn10_inf.csv"), index=False)
+                    #
+                    # ans_knn15.append(knn15_exp.results['best_ans'])
+                    # # ans_knn15_shape.append(knn15_exp.results['best_ans'].shape)
+                    # best_ans_score_knn15.append(knn15_exp.results['best_ans_score'])
+                    # knn15_solving_time.append(knn15_exp.results['solving_time'])
+                    # knn15_exp.results['d_inf'].to_csv(os.path.join(results_path,
+                    #                                                f"{os.path.basename(filename).split('.')[0]}"
+                    #                                                f"_knn15_inf.csv"), index=False)
+                    #
+                    # ans_mc.append(mc_exp.results['best_ans'])
+                    # # ans_mc_shape.append(mc_exp.results['best_ans'].shape)
+                    # best_ans_score_mc.append(mc_exp.results['best_ans_score'])
+                    # mc_solving_time.append(mc_exp.results['solving_time'])
+                    # mc_exp.results['d_inf'].to_csv(os.path.join(results_path,
+                    #                                             f"{os.path.basename(filename).split('.')[0]}"
+                    #                                             f"_mc_inf.csv"), index=False)
+                    #
+                    # ans_obo.append(obo_exp.results['best_ans'])
+                    # # ans_obo_shape.append(obo_exp.results['best_ans'].shape)
+                    # best_ans_score_obo.append(obo_exp.results['best_ans_score'])
+                    # obo_solving_time.append(obo_exp.results['solving_time'])
+                    # obo_exp.results['d_inf'].to_csv(os.path.join(results_path,
+                    #                                              f"{os.path.basename(filename).split('.')[0]}"
+                    #                                              f"_obo_inf.csv"), index=False)
+
+                    # print()
+                    #
+                    # # print convergence
+                    # print("print score convergence")
+                    # # Plotter.score_converge(exp_dict_list=[knn_exp, mc_exp, obo_exp],
+                    # #                        exp_names=["KNN", "MC", "OBO"],
+                    # #                        save_path=os.path.join(results_path,
+                    # #                                               f"{os.path.basename(filename).split('.')[0]}"
+                    # #                                               f"_score_conv.png"))
+                    # Plotter.score_converge(exp_dict_list=[knn5_exp, knn10_exp, knn15_exp, mc_exp, obo_exp],
+                    #                        exp_names=["KNN5", "KNN10", "KNN15", "MC", "OBO"],
+                    #                        save_path=os.path.join(results_path,
+                    #                                               f"{os.path.basename(filename).split('.')[0]}"
+                    #                                               f"_score_conv.png"))
+                    #
+                    # print("print shape convergence")
+                    # # Plotter.shape_converge(exp_dict_list=[knn_exp, mc_exp, obo_exp],
+                    # #                        exp_names=["KNN", "MC", "OBO"],
+                    # #                        save_path=os.path.join(results_path,
+                    # #                                               f"{os.path.basename(filename).split('.')[0]}"
+                    # #                                               f"_shape_conv.png"))
+                    # Plotter.shape_converge(exp_dict_list=[knn5_exp, knn10_exp, knn15_exp, mc_exp, obo_exp],
+                    #                        exp_names=["KNN5", "KNN10", "KNN15", "MC", "OBO"],
+                    #                        save_path=os.path.join(results_path,
+                    #                                               f"{os.path.basename(filename).split('.')[0]}"
+                    #                                               f"_shape_conv.png"))
 
                     print()
                     # break
 
             # 4) Save experiments metadata
-            analysis_df = pd.DataFrame({'dataset': file_names,
-                                        'knn5_score': best_ans_score_knn5,
-                                        'knn10_score': best_ans_score_knn10,
-                                        'knn15_score': best_ans_score_knn15,
-                                        'mc_score': best_ans_score_mc,
-                                        'obo_score': best_ans_score_obo,
-                                        'knn5_features': [ans.columns.values for ans in best_ans_knn5],
-                                        'knn10_features': [ans.columns.values for ans in best_ans_knn10],
-                                        'knn15_features': [ans.columns.values for ans in best_ans_knn15],
-                                        'mc_features': [ans.columns.values for ans in best_ans_mc],
-                                        'obo_features': [ans.columns.values for ans in best_ans_obo],
-                                        'knn5_shape': [ans.shape for ans in best_ans_knn5],
-                                        'knn10_shape': [ans.shape for ans in best_ans_knn10],
-                                        'knn15_shape': [ans.shape for ans in best_ans_knn15],
-                                        'mc_shape': [ans.shape for ans in best_ans_mc],
-                                        'obo_shape': [ans.shape for ans in best_ans_obo],
-                                        'knn5_solving_time': knn5_solving_time,
-                                        'knn10_solving_time': knn10_solving_time,
-                                        'knn15_solving_time': knn15_solving_time,
-                                        'mc_solving_time': mc_solving_time,
-                                        'obo_solving_time': obo_solving_time})
+            # print('Save experiments metadata')
+            print()
+            # analysis_df = pd.DataFrame({'dataset': file_names,
+            #                             'knn5_score': best_ans_score_knn5,
+            #                             'knn10_score': best_ans_score_knn10,
+            #                             'knn15_score': best_ans_score_knn15,
+            #                             'mc_score': best_ans_score_mc,
+            #                             'obo_score': best_ans_score_obo,
+            #                             'knn5_features': [ans.columns.values for ans in ans_knn5],
+            #                             'knn10_features': [ans.columns.values for ans in ans_knn10],
+            #                             'knn15_features': [ans.columns.values for ans in ans_knn15],
+            #                             'mc_features': [ans.columns.values for ans in ans_mc],
+            #                             'obo_features': [ans.columns.values for ans in ans_obo],
+            #                             'knn5_shape': [ans.shape for ans in ans_knn5],
+            #                             'knn10_shape': [ans.shape for ans in ans_knn10],
+            #                             'knn15_shape': [ans.shape for ans in ans_knn15],
+            #                             'mc_shape': [ans.shape for ans in ans_mc],
+            #                             'obo_shape': [ans.shape for ans in ans_obo],
+            #                             'knn5_solving_time': knn5_solving_time,
+            #                             'knn10_solving_time': knn10_solving_time,
+            #                             'knn15_solving_time': knn15_solving_time,
+            #                             'mc_solving_time': mc_solving_time,
+            #                             'obo_solving_time': obo_solving_time})
+            analysis_dict_2df = {'dataset': file_names}
+            for exp_name, exp_data in exp_dict.items():
+                analysis_dict_2df[f'{exp_name}_score'] = exp_data['ans_score']
+            for exp_name, exp_data in exp_dict.items():
+                analysis_dict_2df[f'{exp_name}_global_sim'] = exp_data['global_sim']
+            for exp_name, exp_data in exp_dict.items():
+                analysis_dict_2df[f'{exp_name}_local_sim'] = exp_data['local_sim']
+            for exp_name, exp_data in exp_dict.items():
+                analysis_dict_2df[f'{exp_name}_local_diff'] = exp_data['local_diff']
+            for exp_name, exp_data in exp_dict.items():
+                analysis_dict_2df[f'{exp_name}_features'] = [ans.columns.values for ans in exp_dict[exp_name]['ans']]
+            for exp_name, exp_data in exp_dict.items():
+                analysis_dict_2df[f'{exp_name}_shape'] = [ans.shape for ans in exp_dict[exp_name]['ans']]
+            for exp_name, exp_data in exp_dict.items():
+                analysis_dict_2df[f'{exp_name}_solving_time'] = exp_data['solving_time']
+            analysis_df = pd.DataFrame(analysis_dict_2df)
+
+
             # analysis_df = pd.DataFrame({'best_ans_score_knn': best_ans_score_knn,
             #                             'best_ans_score_mc': best_ans_score_mc,
             #                             'best_ans_score_obo': best_ans_score_obo,
@@ -274,6 +357,5 @@ if __name__ == '__main__':
              d_tag_size=10,
              time_limit_seconds=300,
              corpus_name="DBSCAN_rc50_pmNone")
-
 
 from explanation_analysis.similarity_metrices.sim_euclidean_inverse import InverseEuclideanSim

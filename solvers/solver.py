@@ -19,6 +19,9 @@ class Solver:
             "rows_indexes": [],
             "cols_indexes": [],
             "shape": [],
+            "global_sim": [],
+            "local_sim": [],
+            "local_diff": [],
             "score": []
         }
 

@@ -54,6 +54,9 @@ class OneOneSolver(Solver):
                     this_rows.append(row_index)
                     score = scorer.compute(d=d.iloc[this_rows], s=s, f_sim=cols,
                                            f_diff=[feature for feature in features if feature not in cols])
+                    global_sim, local_sim, local_diff = scorer.compute_parts(d=d.iloc[this_rows], s=s, f_sim=cols,
+                                                                             f_diff=[feature for feature in features if
+                                                                                     feature not in cols])
                     if best_row_score < score:
                         best_row_score = score
                         best_row_index = row_index
@@ -77,6 +80,9 @@ class OneOneSolver(Solver):
                     this_cols.append(col_index)
                     score = scorer.compute(d=d.iloc[rows], s=s, f_sim=this_cols,
                                            f_diff=[feature for feature in features if feature not in this_cols])
+                    global_sim, local_sim, local_diff = scorer.compute_parts(d=d.iloc[rows], s=s, f_sim=this_cols,
+                                                                             f_diff=[feature for feature in features if
+                                                                                     feature not in this_cols])
                     if best_col_score < score:
                         best_col_score = score
                         best_col_index = col_index
@@ -97,6 +103,9 @@ class OneOneSolver(Solver):
             self.convert_process["cols_indexes"].append(cols)
             self.convert_process["shape"].append([len(rows), len(cols)])
             self.convert_process["score"].append(best_score)
+            self.convert_process["global_sim"].append(global_sim)
+            self.convert_process["local_sim"].append(local_sim)
+            self.convert_process["local_diff"].append(local_diff)
 
         if self.convert_process["time"][-1] < 60:
             self.convert_process["time"].append(60.0)
@@ -104,6 +113,9 @@ class OneOneSolver(Solver):
             self.convert_process["cols_indexes"].append(self.convert_process["cols_indexes"][-1])
             self.convert_process["shape"].append(self.convert_process["shape"][-1])
             self.convert_process["score"].append(self.convert_process["score"][-1])
+            self.convert_process["global_sim"].append(self.convert_process["global_sim"][-1])
+            self.convert_process["local_sim"].append(self.convert_process["local_sim"][-1])
+            self.convert_process["local_diff"].append(self.convert_process["local_diff"][-1])
 
         # return the best so far
         ans = d.loc[rows, cols]
