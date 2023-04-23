@@ -48,8 +48,10 @@ class OneOneSolver(Solver):
                 break
             if is_row:
                 best_row_score = -99999999
-                best_row_index = iter_rows[0]
+                best_row_index = [iter_rows[random.randrange(len(iter_rows))]]  # iter_rows[0]
                 for row_index in iter_rows:
+                    if row_index in rows:
+                        pass
                     this_rows = rows.copy()  # why?
                     this_rows.append(row_index)
                     score = scorer.compute(d=d.iloc[this_rows], s=s, f_sim=cols,
@@ -60,9 +62,11 @@ class OneOneSolver(Solver):
                     if best_row_score < score:
                         best_row_score = score
                         best_row_index = row_index
-                rows.append(best_row_index)
-                best_score = best_row_score
-                iter_rows = list(set(iter_rows) - set([best_row_index]))
+
+                if best_row_index not in rows:
+                    rows.append(best_row_index)
+                    best_score = best_row_score
+                iter_rows = list(set(iter_rows) - set(rows))
 
                 if len(rows) == rows_num:
                     stop_switch = True
@@ -74,8 +78,10 @@ class OneOneSolver(Solver):
 
             else:
                 best_col_score = -99999999
-                best_col_index = iter_features[0]
+                best_col_index = [iter_features[random.randrange(len(iter_features))]]  # iter_features[0]
                 for col_index in iter_features:
+                    if col_index in cols:
+                        pass
                     this_cols = cols.copy()
                     this_cols.append(col_index)
                     score = scorer.compute(d=d.iloc[rows], s=s, f_sim=this_cols,
@@ -86,9 +92,11 @@ class OneOneSolver(Solver):
                     if best_col_score < score:
                         best_col_score = score
                         best_col_index = col_index
-                cols.append(best_col_index)
-                best_score = best_col_score
-                iter_features = list(set(iter_features) - set([best_col_index]))
+
+                if best_col_index not in cols:
+                    cols.append(best_col_index)
+                    best_score = best_col_score
+                iter_features = list(set(iter_features) - set(cols))
 
                 if len(cols) == len(features):
                     stop_switch = True
