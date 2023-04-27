@@ -34,7 +34,7 @@ class MonteCarloSolver(Solver):
         # run until the time is over
         while (time() - start_time) < time_limit_seconds or best_ans is None:
             # pick number of rows
-            row_count = random.randint(1, d.shape[0])
+            row_count = random.randint(2, d.shape[0])
             # pick number of cols
             col_count = random.randint(1, d.shape[1])
             # pick rows for D' at random

@@ -30,11 +30,12 @@ class OneOneSolver(Solver):
               scorer: AfesMetric) -> tuple:
         # check what is the best solution
         features = list(d.columns.values)
-        iter_features = features.copy()
+        start_feature = features[random.randrange(len(features))]
+        iter_features = list(set(features) - set([start_feature]))
         rows_num = len(d)
         iter_rows = list(range(rows_num))
 
-        cols = [features[random.randrange(len(features))]]
+        cols = [start_feature]
         rows = []
         is_row = True
         stop_switch = False
@@ -42,7 +43,7 @@ class OneOneSolver(Solver):
         # run until the time is over
         best_score = 0
         start_time = time()
-        for index in range(self.d_tag_size + self.f_diff_size):
+        for index in range(self.d_tag_size + self.f_diff_size - 1):  # self.d_tag_size + self.f_diff_size - 1
             # just to break over time
             if (time() - start_time) > time_limit_seconds:
                 break
@@ -68,7 +69,7 @@ class OneOneSolver(Solver):
                     best_score = best_row_score
                 iter_rows = list(set(iter_rows) - set(rows))
 
-                if len(rows) == rows_num:
+                if len(rows) == self.d_tag_size:  # rows_num
                     stop_switch = True
                     is_row = False
                 elif stop_switch:
@@ -98,7 +99,7 @@ class OneOneSolver(Solver):
                     best_score = best_col_score
                 iter_features = list(set(iter_features) - set(cols))
 
-                if len(cols) == len(features):
+                if len(cols) == self.f_diff_size:  # len(features)
                     stop_switch = True
                     is_row = True
                 elif stop_switch:
