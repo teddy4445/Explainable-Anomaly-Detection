@@ -22,6 +22,7 @@ from solvers.one_ones_solver import OneOneSolver
 from explanation_analysis.afes.afes_sum import AfesSum
 from explanation_analysis.similarity_metrices.sim_euclidean import EuclideanSim
 from explanation_analysis.similarity_metrices.sim_euclidean_inverse import InverseEuclideanSim
+from explanation_analysis.similarity_metrices.sim_min_inverse import InverseMinSim
 
 
 class Main:
@@ -100,19 +101,21 @@ class Main:
             curr_exp = Experiment(time_limit_seconds=time_limit_seconds)
             curr_exp.run(anomaly_algo=DBSCANwrapper(),
                          solver=exp_data['solver'](param=exp_data['params']),
-                         scorer=AfesSum(sim_module=InverseEuclideanSim(), w_gsim=1, w_ldiff=1, w_lsim=1),
+                         scorer=AfesSum(sim_module=InverseMinSim(), w_gsim=1, w_ldiff=1, w_lsim=1, w_cov=1),
                          d_tags=[d_tag], f_diff_list=[f_diff], anomaly_sample=anomaly_sample,
                          dataset=dataset_wo_anomaly)
 
             # check results
             print("check results")
             exp_dict[exp_name]['ans'].append(curr_exp.results['best_ans'])
-            exp_dict[exp_name]['shape'].append(curr_exp.results['best_ans'].shape)
+            exp_dict[exp_name]['data_shape'].append(dataset.shape)
+            exp_dict[exp_name]['ans_shape'].append(curr_exp.results['best_ans'].shape)
             exp_dict[exp_name]['ans_score'].append(curr_exp.results['best_ans_score'])
             exp_dict[exp_name]['solving_time'].append(curr_exp.results['solving_time'])
             exp_dict[exp_name]['global_sim'].append(curr_exp.convert_process['global_sim'][-1])
             exp_dict[exp_name]['local_sim'].append(curr_exp.convert_process['local_sim'][-1])
             exp_dict[exp_name]['local_diff'].append(curr_exp.convert_process['local_diff'][-1])
+            exp_dict[exp_name]['coverage'].append(curr_exp.convert_process['coverage'][-1])
 
             if save_d_inf:
                 curr_exp.results['d_inf'].to_csv(os.path.join(results_path,
@@ -149,28 +152,32 @@ class Main:
         ad_algo = IsolationForestwrapper()
         ad_algo.fit(dataset)
         labels = ad_algo.predict(dataset)
+        anomaly_indexes = [i for i in range(len(labels)) if labels[i] == 1]
 
-        anomaly_sample = dataset.loc[dataset[''] == 2].iloc[-1]
-        dataset_wo_anomaly = dataset.loc[dataset[''] == 2].reset_index(drop=True)
+        anomaly_sample = dataset.iloc[anomaly_indexes[0]]  # first anomaly
+        dataset_wo_anomaly = pd.concat([dataset.iloc[:anomaly_indexes[0]], dataset.iloc[anomaly_indexes[0] + 1:]],
+                                       ignore_index=True)
 
         for exp_name, exp_data in exp_dict.items():
             print(exp_name)
             curr_exp = Experiment(time_limit_seconds=time_limit_seconds)
             curr_exp.run(anomaly_algo=DBSCANwrapper(),
                          solver=exp_data['solver'](param=exp_data['params']),
-                         scorer=AfesSum(sim_module=InverseEuclideanSim(), w_gsim=1, w_ldiff=1, w_lsim=1),
+                         scorer=AfesSum(sim_module=InverseEuclideanSim(), w_gsim=1, w_ldiff=0.1, w_lsim=10, w_cov=1),
                          d_tags=[], f_diff_list=[], anomaly_sample=anomaly_sample,
                          dataset=dataset_wo_anomaly)
 
             # check results
             print("check results")
             exp_dict[exp_name]['ans'].append(curr_exp.results['best_ans'])
-            exp_dict[exp_name]['shape'].append(curr_exp.results['best_ans'].shape)
+            exp_dict[exp_name]['data_shape'].append(dataset.shape)
+            exp_dict[exp_name]['ans_shape'].append(curr_exp.results['best_ans'].shape)
             exp_dict[exp_name]['ans_score'].append(curr_exp.results['best_ans_score'])
             exp_dict[exp_name]['solving_time'].append(curr_exp.results['solving_time'])
             exp_dict[exp_name]['global_sim'].append(curr_exp.convert_process['global_sim'][-1])
             exp_dict[exp_name]['local_sim'].append(curr_exp.convert_process['local_sim'][-1])
             exp_dict[exp_name]['local_diff'].append(curr_exp.convert_process['local_diff'][-1])
+            exp_dict[exp_name]['coverage'].append(curr_exp.convert_process['coverage'][-1])
 
             if save_d_inf:
                 curr_exp.results['d_inf'].to_csv(os.path.join(results_path,
@@ -197,6 +204,8 @@ class Main:
     @staticmethod
     def save_metadata(analysis_dict_2df, exp_dict):
         for exp_name, exp_data in exp_dict.items():
+            analysis_dict_2df['data_shape'] = exp_data['data_shape']
+        for exp_name, exp_data in exp_dict.items():
             analysis_dict_2df[f'{exp_name}_score'] = exp_data['ans_score']
         for exp_name, exp_data in exp_dict.items():
             analysis_dict_2df[f'{exp_name}_global_sim'] = exp_data['global_sim']
@@ -205,9 +214,11 @@ class Main:
         for exp_name, exp_data in exp_dict.items():
             analysis_dict_2df[f'{exp_name}_local_diff'] = exp_data['local_diff']
         for exp_name, exp_data in exp_dict.items():
+            analysis_dict_2df[f'{exp_name}_coverage'] = exp_data['coverage']
+        for exp_name, exp_data in exp_dict.items():
             analysis_dict_2df[f'{exp_name}_features'] = [ans.columns.values for ans in exp_dict[exp_name]['ans']]
         for exp_name, exp_data in exp_dict.items():
-            analysis_dict_2df[f'{exp_name}_shape'] = [ans.shape for ans in exp_dict[exp_name]['ans']]
+            analysis_dict_2df[f'{exp_name}_shape'] = exp_data['ans_shape']
         for exp_name, exp_data in exp_dict.items():
             analysis_dict_2df[f'{exp_name}_solving_time'] = exp_data['solving_time']
         # analysis_dict_2df['GT_score'] = GT_dict['ans_score']
@@ -269,11 +280,13 @@ class Main:
                                'sim_module': InverseEuclideanSim}}
             for exp_name, exp_data in exp_dict.items():
                 exp_dict[exp_name]['ans'] = []
-                exp_dict[exp_name]['shape'] = []
+                exp_dict[exp_name]['data_shape'] = []
+                exp_dict[exp_name]['ans_shape'] = []
                 exp_dict[exp_name]['ans_score'] = []
                 exp_dict[exp_name]['global_sim'] = []
                 exp_dict[exp_name]['local_sim'] = []
                 exp_dict[exp_name]['local_diff'] = []
+                exp_dict[exp_name]['coverage'] = []
                 exp_dict[exp_name]['solving_time'] = []
 
             # GT_dict = {'ans_score': [], 'global_sim': [], 'local_sim': [], 'local_diff': []}
@@ -334,6 +347,6 @@ if __name__ == '__main__':
     Main.run(create_corpus=False,
              f_diff=None,
              run_experiments=True,
-             supervised=False,
+             supervised=True,
              time_limit_seconds=60,
-             corpus_name="T_Corpus_fixed")
+             corpus_name="partial_synthetic")  # DBSCAN_rc50_pmNone

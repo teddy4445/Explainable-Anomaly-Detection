@@ -134,11 +134,16 @@ def project_fdiff(file_name, f_diff, method='tsne', plot=True, save=False):
 
 
 if __name__ == '__main__':
-    file_name = 'data/DBSCAN_rc50_pmNone/synt_iter6_inf.csv'
+    file_name = 'data/DBSCAN_rc50_pmNone/synt_iter2_inf.csv'
+    # file_name = 'results/DBSCAN_rc50_pmNone/synt_iter0_inf_obo_inf.csv'
+    # file_name = 'data/T_Corpus/arcene.csv'
+    # file_name = 'data/T_Corpus/clinical_1.csv'
+
 
     # reading the CSV file
-    d_inf = pd.read_csv(file_name)
+    dataset = pd.read_csv(file_name)
 
     # scatter_3d(d_inf)
     f_diff = ['0', '1']
+
     project_fdiff(file_name, f_diff=f_diff, method='tsne', plot=True, save=False)

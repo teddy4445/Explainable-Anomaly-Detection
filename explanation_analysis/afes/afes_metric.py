@@ -16,6 +16,7 @@ class AfesMetric:
         self.sim_module = sim_module
 
     def compute(self,
+                overall_size: int,
                 d: pd.DataFrame,
                 s: list,
                 f_sim: list,
@@ -23,6 +24,7 @@ class AfesMetric:
         pass
 
     def compute_parts(self,
+                      overall_size: int,
                       d: pd.DataFrame,
                       s: list,
                       f_sim: list,

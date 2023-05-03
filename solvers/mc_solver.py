@@ -49,10 +49,12 @@ class MonteCarloSolver(Solver):
             ans = d.loc[rows_indexes]
             # score it
             score = scorer.compute(d=ans, s=s, f_sim=cols_indexes,
-                                   f_diff=[feature for feature in features if feature not in cols_indexes])
-            global_sim, local_sim, local_diff = scorer.compute_parts(d=ans, s=s, f_sim=cols_indexes,
-                                                                     f_diff=[feature for feature in features if
-                                                                             feature not in cols_indexes])
+                                   f_diff=[feature for feature in features if feature not in cols_indexes],
+                                   overall_size=len(d))
+            global_sim, local_sim, local_diff, coverage = scorer.compute_parts(d=ans, s=s, f_sim=cols_indexes,
+                                                                               f_diff=[feature for feature in features
+                                                                                       if feature not in cols_indexes],
+                                                                               overall_size=len(d))
 
             # if best so far, replace and record
             if score > best_ans_score:
@@ -67,9 +69,10 @@ class MonteCarloSolver(Solver):
             self.convert_process["global_sim"].append(global_sim)
             self.convert_process["local_sim"].append(local_sim)
             self.convert_process["local_diff"].append(local_diff)
+            self.convert_process["coverage"].append(coverage)
 
-        if self.convert_process["time"][-1] < 60:
-            self.convert_process["time"].append(60.0)
+        if self.convert_process["time"][-1] < time_limit_seconds:
+            self.convert_process["time"].append(time_limit_seconds)
             self.convert_process["rows_indexes"].append(self.convert_process["rows_indexes"][-1])
             self.convert_process["cols_indexes"].append(self.convert_process["cols_indexes"][-1])
             self.convert_process["shape"].append(self.convert_process["shape"][-1])
@@ -77,6 +80,7 @@ class MonteCarloSolver(Solver):
             self.convert_process["global_sim"].append(self.convert_process["global_sim"][-1])
             self.convert_process["local_sim"].append(self.convert_process["local_sim"][-1])
             self.convert_process["local_diff"].append(self.convert_process["local_diff"][-1])
+            self.convert_process["coverage"].append(self.convert_process["coverage"][-1])
 
         assoc = np.zeros(len(d), dtype=int)
         assoc[rows_indexes] = 1

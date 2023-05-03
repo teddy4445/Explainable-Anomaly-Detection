@@ -22,6 +22,7 @@ class Solver:
             "global_sim": [],
             "local_sim": [],
             "local_diff": [],
+            "coverage": [],
             "score": []
         }
 

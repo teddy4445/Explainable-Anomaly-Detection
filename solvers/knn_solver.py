@@ -53,10 +53,12 @@ class KnnSolver(Solver):
             ans = d.iloc[rows_indexes]
             # score it
             score = scorer.compute(d=ans, s=s, f_sim=cols_indexes,
-                                   f_diff=[feature for feature in features if feature not in cols_indexes])
-            global_sim, local_sim, local_diff = scorer.compute_parts(d=ans, s=s, f_sim=cols_indexes,
-                                                                     f_diff=[feature for feature in features if
-                                                                             feature not in cols_indexes])
+                                   f_diff=[feature for feature in features if feature not in cols_indexes],
+                                   overall_size=len(d))
+            global_sim, local_sim, local_diff, coverage = scorer.compute_parts(d=ans, s=s, f_sim=cols_indexes,
+                                                                               f_diff=[feature for feature in features
+                                                                                       if feature not in cols_indexes],
+                                                                               overall_size=len(d))
 
             # if best so far, replace and record
             if score > best_ans_score:
