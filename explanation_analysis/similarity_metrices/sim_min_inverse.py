@@ -20,9 +20,9 @@ class InverseMinSim(SimMetric):
             s: list | pd.Series,
             features: list):
         if isinstance(s, pd.Series):
-            s = s.to_numpy()
+            s = s[features].to_numpy()
         if isinstance(d, pd.DataFrame):
-            d = d.to_numpy()
+            d = d[features].to_numpy()
         elif isinstance(d, list) and len(d) > 0 and len(d[0]) > 0:
             d = np.array(d[features]).mean(0)
         else:

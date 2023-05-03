@@ -34,11 +34,11 @@ class Experiment:
         This method runs an algorithm on the experiment_properties's data and stores the results needed for this experiment_properties
         """
         solving_start_time = time.perf_counter()
-        best_ans, best_ans_score, assoc = solver.solve(d=dataset,
-                                                       anomaly_algo=anomaly_algo,
-                                                       s=anomaly_sample,
-                                                       time_limit_seconds=self._time_limit_seconds,
-                                                       scorer=scorer)
+        best_ans, scores, assoc = solver.solve(d=dataset,
+                                               anomaly_algo=anomaly_algo,
+                                               s=anomaly_sample,
+                                               time_limit_seconds=self._time_limit_seconds,
+                                               scorer=scorer)
         solving_end_time = time.perf_counter()
         solving_time = solving_end_time - solving_start_time
 
@@ -49,7 +49,7 @@ class Experiment:
 
         self.results = {"best_ans": best_ans,
                         "d_inf": d_inf,
-                        "best_ans_score": best_ans_score,
+                        "scores": scores,
                         "solving_time": solving_time}
         self.convert_process = solver.convert_process
         self.baseline = {

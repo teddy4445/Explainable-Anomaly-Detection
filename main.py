@@ -110,12 +110,12 @@ class Main:
             exp_dict[exp_name]['ans'].append(curr_exp.results['best_ans'])
             exp_dict[exp_name]['data_shape'].append(dataset.shape)
             exp_dict[exp_name]['ans_shape'].append(curr_exp.results['best_ans'].shape)
-            exp_dict[exp_name]['ans_score'].append(curr_exp.results['best_ans_score'])
+            exp_dict[exp_name]['ans_score'].append(curr_exp.results['scores']['best_score'])
             exp_dict[exp_name]['solving_time'].append(curr_exp.results['solving_time'])
-            exp_dict[exp_name]['global_sim'].append(curr_exp.convert_process['global_sim'][-1])
-            exp_dict[exp_name]['local_sim'].append(curr_exp.convert_process['local_sim'][-1])
-            exp_dict[exp_name]['local_diff'].append(curr_exp.convert_process['local_diff'][-1])
-            exp_dict[exp_name]['coverage'].append(curr_exp.convert_process['coverage'][-1])
+            exp_dict[exp_name]['global_sim'].append(curr_exp.results['scores']['best_gs'])
+            exp_dict[exp_name]['local_sim'].append(curr_exp.results['scores']['best_ls'])
+            exp_dict[exp_name]['local_diff'].append(curr_exp.results['scores']['best_ld'])
+            exp_dict[exp_name]['coverage'].append(curr_exp.results['scores']['best_cov'])
 
             if save_d_inf:
                 curr_exp.results['d_inf'].to_csv(os.path.join(results_path,
@@ -172,12 +172,12 @@ class Main:
             exp_dict[exp_name]['ans'].append(curr_exp.results['best_ans'])
             exp_dict[exp_name]['data_shape'].append(dataset.shape)
             exp_dict[exp_name]['ans_shape'].append(curr_exp.results['best_ans'].shape)
-            exp_dict[exp_name]['ans_score'].append(curr_exp.results['best_ans_score'])
+            exp_dict[exp_name]['ans_score'].append(curr_exp.results['scores']['score'])
             exp_dict[exp_name]['solving_time'].append(curr_exp.results['solving_time'])
-            exp_dict[exp_name]['global_sim'].append(curr_exp.convert_process['global_sim'][-1])
-            exp_dict[exp_name]['local_sim'].append(curr_exp.convert_process['local_sim'][-1])
-            exp_dict[exp_name]['local_diff'].append(curr_exp.convert_process['local_diff'][-1])
-            exp_dict[exp_name]['coverage'].append(curr_exp.convert_process['coverage'][-1])
+            exp_dict[exp_name]['global_sim'].append(curr_exp.results['scores']['best_gs'])
+            exp_dict[exp_name]['local_sim'].append(curr_exp.results['scores']['best_ls'])
+            exp_dict[exp_name]['local_diff'].append(curr_exp.results['scores']['best_ld'])
+            exp_dict[exp_name]['coverage'].append(curr_exp.results['scores']['best_cov'])
 
             if save_d_inf:
                 curr_exp.results['d_inf'].to_csv(os.path.join(results_path,

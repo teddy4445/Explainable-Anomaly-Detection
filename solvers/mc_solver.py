@@ -58,8 +58,13 @@ class MonteCarloSolver(Solver):
 
             # if best so far, replace and record
             if score > best_ans_score:
-                best_ans_score = score
+                # best_score = score
                 best_ans = ans
+                scores = {'best_score': score,
+                          'best_gs': global_sim,
+                          'best_ls': local_sim,
+                          'best_ld': local_diff,
+                          'best_cov': coverage}
 
             self.convert_process["time"].append(time() - start_time)
             self.convert_process["rows_indexes"].append(rows_indexes)
@@ -86,4 +91,4 @@ class MonteCarloSolver(Solver):
         assoc[rows_indexes] = 1
 
         # return the best so far
-        return best_ans, best_ans_score, list(assoc)
+        return best_ans, scores, list(assoc)
