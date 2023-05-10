@@ -16,6 +16,7 @@ from anomaly_detection_algos.IsolationForest import IsolationForestwrapper
 from experiments.experiment import Experiment
 from experiments.experiment_properties.feature_distribution_normal import FeatureDistributionNormal
 from experiments.synthetic_dataset_generation import SyntheticDatasetGeneration
+from solvers.bf_solver import BruteForceSolver
 from solvers.knn_solver import KnnSolver
 from solvers.mc_solver import MonteCarloSolver
 from solvers.one_ones_solver import OneOneSolver
@@ -163,7 +164,7 @@ class Main:
             curr_exp = Experiment(time_limit_seconds=time_limit_seconds)
             curr_exp.run(anomaly_algo=DBSCANwrapper(),
                          solver=exp_data['solver'](param=exp_data['params']),
-                         scorer=AfesSum(sim_module=InverseEuclideanSim(), w_gsim=1, w_ldiff=0.1, w_lsim=10, w_cov=1),
+                         scorer=AfesSum(sim_module=InverseMinSim(), w_gsim=1, w_ldiff=0.1, w_lsim=10, w_cov=1),
                          d_tags=[], f_diff_list=[], anomaly_sample=anomaly_sample,
                          dataset=dataset_wo_anomaly)
 
@@ -274,10 +275,32 @@ class Main:
             #             'obo': {'solver': OneOneSolver,
             #                     'params': {"d_tag_size": d_tag_size, "f_diff_size": len(f_diff)}}
             #             }
-            exp_dict = {'mc': {'solver': MonteCarloSolver,
-                               'params': {},
+            # exp_dict = {'mc': {'solver': MonteCarloSolver,
+            #                    'params': {},
+            #                    'scorer': AfesSum,
+            #                    'sim_module': InverseEuclideanSim}}
+            # exp_dict = {'mc': {'solver': MonteCarloSolver,
+            #                    'params': {},
+            #                    'scorer': AfesSum,
+            #                    'sim_module': InverseMinSim}}
+            print()
+            # exp_dict = {'bf': {'solver': BruteForceSolver,
+            #                    'params': {},
+            #                    'scorer': AfesSum,
+            #                    'sim_module': InverseEuclideanSim}}
+            # exp_dict = {'bf': {'solver': BruteForceSolver,
+            #                    'params': {'columns': ['0', '1'], 'rows_num': 10},
+            #                    'scorer': AfesSum,
+            #                    'sim_module': InverseEuclideanSim}}
+            exp_dict = {'bf': {'solver': BruteForceSolver,
+                               'params': {'rows': [0, 5, 10, 11, 19, 22, 25, 35, 47],
+                                          'columns_num': 2},
                                'scorer': AfesSum,
                                'sim_module': InverseEuclideanSim}}
+            # 0 = [6, 14, 16, 18, 23, 24, 26, 40, 41]
+            # 1 = [7, 11, 12, 14, 15, 17, 21, 43, 48]
+            # 4 = [0, 5, 10, 11, 19, 22, 25, 35, 47]
+
             for exp_name, exp_data in exp_dict.items():
                 exp_dict[exp_name]['ans'] = []
                 exp_dict[exp_name]['data_shape'] = []
@@ -348,5 +371,5 @@ if __name__ == '__main__':
              f_diff=None,
              run_experiments=True,
              supervised=True,
-             time_limit_seconds=60,
+             time_limit_seconds=300,
              corpus_name="partial_synthetic")  # DBSCAN_rc50_pmNone

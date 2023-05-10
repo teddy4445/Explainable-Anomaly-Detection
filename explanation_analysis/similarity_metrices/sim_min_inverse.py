@@ -22,6 +22,8 @@ class InverseMinSim(SimMetric):
         if isinstance(s, pd.Series):
             s = s[features].to_numpy()
         if isinstance(d, pd.DataFrame):
+            if 0 in d.shape:
+                return 0
             d = d[features].to_numpy()
         elif isinstance(d, list) and len(d) > 0 and len(d[0]) > 0:
             d = np.array(d[features]).mean(0)
@@ -30,4 +32,6 @@ class InverseMinSim(SimMetric):
 
         dist_array = np.linalg.norm(d - s, axis=1)
         # at this stage both 's' and 'd' are lists
+        if len(dist_array) == 0:
+            return 0
         return 1 / (1 + np.min(dist_array))

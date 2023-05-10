@@ -1,0 +1,11 @@
+,0
+dataset,synt_iter0_inf
+data_shape,"(50, 5)"
+bf_score,1.8597508284660456
+bf_global_sim,0.7930142799985249
+bf_local_sim,0.8830630790797654
+bf_local_diff,0.0
+bf_coverage,0.1836734693877551
+bf_features,['0' '3']
+bf_shape,"(9, 2)"
+bf_solving_time,0.2314146999999993
