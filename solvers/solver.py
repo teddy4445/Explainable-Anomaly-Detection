@@ -17,7 +17,7 @@ class Solver:
         self.convert_process = {
             "time": [],
             "rows_indexes": [],
-            "cols_indexes": [],
+            "f_diff": [],
             "shape": [],
             "global_sim": [],
             "local_sim": [],
@@ -34,5 +34,10 @@ class Solver:
               scorer: AfesMetric) -> tuple:
         pass
 
-    def get_convergence_process(self) -> list:
-        return self.convert_process
+    def close_convergence_process(self, time_limit_seconds):
+        if not len(self.convert_process["time"]):
+            pass
+        elif self.convert_process["time"][-1] < time_limit_seconds:
+            self.convert_process["time"].append(time_limit_seconds)
+            for metric in self.convert_process.keys():
+                self.convert_process[metric].append(self.convert_process[metric][-1])

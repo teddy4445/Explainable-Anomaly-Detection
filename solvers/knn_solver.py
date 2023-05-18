@@ -1,10 +1,14 @@
 # library imports
+import itertools
+
 import numpy as np
 import pandas as pd
 from time import time
 from sklearn.neighbors import KNeighborsRegressor
 
 # project imports
+from tqdm import tqdm
+
 from solvers.solver import Solver
 from anomaly_detection_algos.anomaly_algo import AnomalyAlgo
 from explanation_analysis.afes.afes_metric import AfesMetric
@@ -12,83 +16,109 @@ from explanation_analysis.afes.afes_metric import AfesMetric
 
 class KnnSolver(Solver):
     """
-    A KNN approach for the rows (D') and a Top-k approach for F_{diff} such that k is searched using a grid search
+    A KNN approach
     """
 
     def __init__(self,
                  param: dict = None):
-        if param is None:
-            param = {"k": 3}
         Solver.__init__(self,
                         param=param)
-        if isinstance(param["k"], int) and param["k"] > 0:
-            self._k = param["k"]
-        else:
-            raise Exception("KnnSovler.__init__ error saying that 'k' is positive integer")
+        self._k = param.get('k', 3)
+        self.f_diff = param.get('f_diff', None)
+        self.f_diff_size = param.get('f_diff_size', None)
 
     def solve(self,
               anomaly_algo: AnomalyAlgo,
               d: pd.DataFrame,
               s: list,
               time_limit_seconds: int,
-              scorer: AfesMetric) -> tuple:
+              scorer: AfesMetric,
+              save_conv=False) -> tuple:
         features = d.columns.values
-        start_time = time()
-        # check what is the best solution
-        best_ans = None
-        best_ans_score = -99999999
-        f_diff_size = 1
-        # run KNN on the D' for different samples of F_{diff} obtained from F_{diff}
+
+        # run KNN and find top-k
         knn = KNeighborsRegressor(n_neighbors=self._k)
         knn.fit(X=d, y=list(range(d.shape[0])))  # the y is useless so we just put indexes, it can be any value
-        rows_indexes = knn.kneighbors(X=[s],
-                                      n_neighbors=self._k,
-                                      return_distance=False)[0]
+        rows_indexes = knn.kneighbors(X=[s], n_neighbors=self._k, return_distance=False)[0]
         d_tag_full_f = d.iloc[rows_indexes]
-        f_diff_dist_vector = np.abs(np.array(s) - np.array(d_tag_full_f.mean(axis=0)))
-        # run until the time is over
-        while ((time() - start_time) < time_limit_seconds or best_ans is None) and (f_diff_size < d.shape[1]):
-            cols_indexes = (-f_diff_dist_vector).argsort()[:f_diff_size]
-            # obtain the D' with F_{diff}
-            ans = d.iloc[rows_indexes]
-            # score it
-            score = scorer.compute(d=ans, s=s, f_sim=cols_indexes,
-                                   f_diff=[feature for feature in features if feature not in cols_indexes],
-                                   overall_size=len(d))
-            global_sim, local_sim, local_diff, coverage = scorer.compute_parts(d=ans, s=s, f_sim=cols_indexes,
-                                                                               f_diff=[feature for feature in features
-                                                                                       if feature not in cols_indexes],
+        start_time = time()
+
+        if self.f_diff:
+            ans_fdiff = self.f_diff
+            f_sim = [feature for feature in features if feature not in ans_fdiff]
+
+            best_ans_score = scorer.compute(d=d_tag_full_f, s=s, f_sim=f_sim, f_diff=ans_fdiff, overall_size=len(d))
+            global_sim, local_sim, local_diff, coverage = scorer.compute_parts(d=d_tag_full_f, s=s,
+                                                                               f_sim=f_sim, f_diff=ans_fdiff,
                                                                                overall_size=len(d))
 
-            # if best so far, replace and record
-            if score > best_ans_score:
-                best_ans_score = score
-                best_ans = ans
+            solution = {'d_tag': d_tag_full_f,
+                        'shape': (len(d_tag_full_f), len(self.f_diff)),
+                        'f_diff': self.f_diff,
+                        'f_sim': f_sim,
+                        'best_score': best_ans_score,
+                        'best_gs': global_sim,
+                        'best_ls': local_sim,
+                        'best_ld': local_diff,
+                        'best_cov': coverage}
 
-            self.convert_process["time"].append(time() - start_time)
-            self.convert_process["rows_indexes"].append(rows_indexes)
-            self.convert_process["cols_indexes"].append(cols_indexes)
-            self.convert_process["shape"].append([len(rows_indexes), len(cols_indexes)])
-            self.convert_process["score"].append(best_ans_score)
-            self.convert_process["global_sim"].append(global_sim)
-            self.convert_process["local_sim"].append(local_sim)
-            self.convert_process["local_diff"].append(local_diff)
+            # save conversion process
+            if save_conv:
+                self.convert_process["time"].append(time() - start_time)
+                self.convert_process["rows_indexes"].append(rows_indexes)
+                self.convert_process["cols_indexes"].append(self.f_diff)
+                self.convert_process["shape"].append([len(rows_indexes), len(self.f_diff)])
+                self.convert_process["score"].append(best_ans_score)
+                self.convert_process["global_sim"].append(global_sim)
+                self.convert_process["local_sim"].append(local_sim)
+                self.convert_process["local_diff"].append(local_diff)
+                self.convert_process["coverage"].append(coverage)
 
-            # count this try and try larger set
-            f_diff_size += 1
+        else:
+            best_ans_score = -99999999
 
-        if self.convert_process["time"][-1] < 60:
-            self.convert_process["time"].append(60.0)
-            self.convert_process["rows_indexes"].append(self.convert_process["rows_indexes"][-1])
-            self.convert_process["cols_indexes"].append(self.convert_process["cols_indexes"][-1])
-            self.convert_process["shape"].append(self.convert_process["shape"][-1])
-            self.convert_process["score"].append(best_ans_score)
-            self.convert_process["global_sim"].append(self.convert_process["global_sim"][-1])
-            self.convert_process["local_sim"].append(self.convert_process["local_sim"][-1])
-            self.convert_process["local_diff"].append(self.convert_process["local_diff"][-1])
+            # run until the time is over
+            # while (time() - start_time) < time_limit_seconds or best_ans is None:
+            for f_diff_size in range(1, d.shape[1] + 1):
+                subsets_cols = list(map(set, itertools.combinations(list(d.columns.values), f_diff_size)))
+                for cols_indexes in subsets_cols:
+                    f_diff = list(cols_indexes)
+                    f_sim = [feature for feature in features if feature not in f_diff]
+                    # score it
+                    score = scorer.compute(d=d_tag_full_f, s=s, f_sim=f_sim, f_diff=f_diff, overall_size=len(d))
+                    global_sim, local_sim, local_diff, coverage = scorer.compute_parts(d=d_tag_full_f, s=s,
+                                                                                       f_sim=f_sim, f_diff=f_diff,
+                                                                                       overall_size=len(d))
 
+                    # if best so far, replace and record
+                    if score > best_ans_score:
+                        best_ans_score = score
+                        solution = {'d_tag': d_tag_full_f,
+                                    'shape': (len(d_tag_full_f), len(f_diff)),
+                                    'f_diff': f_diff,
+                                    'f_sim': f_sim,
+                                    'best_score': score,
+                                    'best_gs': global_sim,
+                                    'best_ls': local_sim,
+                                    'best_ld': local_diff,
+                                    'best_cov': coverage}
+
+                    # save conversion process
+                    if save_conv:
+                        self.convert_process["time"].append(time() - start_time)
+                        self.convert_process["rows_indexes"].append(rows_indexes)
+                        self.convert_process["cols_indexes"].append(cols_indexes)
+                        self.convert_process["shape"].append([len(rows_indexes), len(cols_indexes)])
+                        self.convert_process["score"].append(score)
+                        self.convert_process["global_sim"].append(global_sim)
+                        self.convert_process["local_sim"].append(local_sim)
+                        self.convert_process["local_diff"].append(local_diff)
+                        self.convert_process["coverage"].append(coverage)
+
+        if save_conv:
+            self.close_convergence_process(time_limit_seconds=time_limit_seconds)
         assoc = np.zeros(len(d), dtype=int)
         assoc[rows_indexes] = 1
 
         # return the best so far
-        return best_ans, best_ans_score, list(assoc)
+        return solution, list(assoc)

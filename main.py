@@ -13,7 +13,7 @@ from consts import *
 from plotter import Plotter
 from anomaly_detection_algos.DBSCAN import DBSCANwrapper
 from anomaly_detection_algos.IsolationForest import IsolationForestwrapper
-from experiments.experiment import Experiment
+from experiments.experiment import Experiment, TRACKED_METRICS
 from experiments.experiment_properties.feature_distribution_normal import FeatureDistributionNormal
 from experiments.synthetic_dataset_generation import SyntheticDatasetGeneration
 from solvers.bf_solver import BruteForceSolver
@@ -87,7 +87,6 @@ class Main:
                                  exp_dict,
                                  dict_main_key='assoc',
                                  time_limit_seconds=60,
-                                 f_diff=[0, 1],
                                  save_d_inf=False,
                                  results_path=None):
 
@@ -103,20 +102,22 @@ class Main:
             curr_exp.run(anomaly_algo=DBSCANwrapper(),
                          solver=exp_data['solver'](param=exp_data['params']),
                          scorer=AfesSum(sim_module=InverseMinSim(), w_gsim=1, w_ldiff=1, w_lsim=1, w_cov=1),
-                         d_tags=[d_tag], f_diff_list=[f_diff], anomaly_sample=anomaly_sample,
-                         dataset=dataset_wo_anomaly)
+                         anomaly_sample=anomaly_sample, dataset=dataset_wo_anomaly)
 
             # check results
             print("check results")
-            exp_dict[exp_name]['ans'].append(curr_exp.results['best_ans'])
-            exp_dict[exp_name]['data_shape'].append(dataset.shape)
-            exp_dict[exp_name]['ans_shape'].append(curr_exp.results['best_ans'].shape)
-            exp_dict[exp_name]['ans_score'].append(curr_exp.results['scores']['best_score'])
-            exp_dict[exp_name]['solving_time'].append(curr_exp.results['solving_time'])
-            exp_dict[exp_name]['global_sim'].append(curr_exp.results['scores']['best_gs'])
-            exp_dict[exp_name]['local_sim'].append(curr_exp.results['scores']['best_ls'])
-            exp_dict[exp_name]['local_diff'].append(curr_exp.results['scores']['best_ld'])
-            exp_dict[exp_name]['coverage'].append(curr_exp.results['scores']['best_cov'])
+            # exp_dict[exp_name]['data_shape'].append(dataset.shape)
+            for metric in TRACKED_METRICS:
+                exp_dict[exp_name][metric].append(curr_exp.results[metric])
+            # exp_dict[exp_name]['ans'].append(curr_exp.results['best_ans'])
+            # exp_dict[exp_name]['ans_shape'].append(curr_exp.results['best_ans'].shape)
+            # exp_dict[exp_name]['f_diff'].append(curr_exp.results['f_diff'])
+            # exp_dict[exp_name]['ans_score'].append(curr_exp.results['scores']['best_score'])
+            # exp_dict[exp_name]['solving_time'].append(curr_exp.results['solving_time'])
+            # exp_dict[exp_name]['global_sim'].append(curr_exp.results['scores']['best_gs'])
+            # exp_dict[exp_name]['local_sim'].append(curr_exp.results['scores']['best_ls'])
+            # exp_dict[exp_name]['local_diff'].append(curr_exp.results['scores']['best_ld'])
+            # exp_dict[exp_name]['coverage'].append(curr_exp.results['scores']['best_cov'])
 
             if save_d_inf:
                 curr_exp.results['d_inf'].to_csv(os.path.join(results_path,
@@ -165,20 +166,13 @@ class Main:
             curr_exp.run(anomaly_algo=DBSCANwrapper(),
                          solver=exp_data['solver'](param=exp_data['params']),
                          scorer=AfesSum(sim_module=InverseMinSim(), w_gsim=1, w_ldiff=0.1, w_lsim=10, w_cov=1),
-                         d_tags=[], f_diff_list=[], anomaly_sample=anomaly_sample,
-                         dataset=dataset_wo_anomaly)
+                         anomaly_sample=anomaly_sample, dataset=dataset_wo_anomaly)
 
             # check results
             print("check results")
-            exp_dict[exp_name]['ans'].append(curr_exp.results['best_ans'])
-            exp_dict[exp_name]['data_shape'].append(dataset.shape)
-            exp_dict[exp_name]['ans_shape'].append(curr_exp.results['best_ans'].shape)
-            exp_dict[exp_name]['ans_score'].append(curr_exp.results['scores']['score'])
-            exp_dict[exp_name]['solving_time'].append(curr_exp.results['solving_time'])
-            exp_dict[exp_name]['global_sim'].append(curr_exp.results['scores']['best_gs'])
-            exp_dict[exp_name]['local_sim'].append(curr_exp.results['scores']['best_ls'])
-            exp_dict[exp_name]['local_diff'].append(curr_exp.results['scores']['best_ld'])
-            exp_dict[exp_name]['coverage'].append(curr_exp.results['scores']['best_cov'])
+            # exp_dict[exp_name]['data_shape'].append(dataset.shape)
+            for metric in TRACKED_METRICS:
+                exp_dict[exp_name][metric].append(curr_exp.results[metric])
 
             if save_d_inf:
                 curr_exp.results['d_inf'].to_csv(os.path.join(results_path,
@@ -204,24 +198,28 @@ class Main:
 
     @staticmethod
     def save_metadata(analysis_dict_2df, exp_dict):
-        for exp_name, exp_data in exp_dict.items():
-            analysis_dict_2df['data_shape'] = exp_data['data_shape']
-        for exp_name, exp_data in exp_dict.items():
-            analysis_dict_2df[f'{exp_name}_score'] = exp_data['ans_score']
-        for exp_name, exp_data in exp_dict.items():
-            analysis_dict_2df[f'{exp_name}_global_sim'] = exp_data['global_sim']
-        for exp_name, exp_data in exp_dict.items():
-            analysis_dict_2df[f'{exp_name}_local_sim'] = exp_data['local_sim']
-        for exp_name, exp_data in exp_dict.items():
-            analysis_dict_2df[f'{exp_name}_local_diff'] = exp_data['local_diff']
-        for exp_name, exp_data in exp_dict.items():
-            analysis_dict_2df[f'{exp_name}_coverage'] = exp_data['coverage']
-        for exp_name, exp_data in exp_dict.items():
-            analysis_dict_2df[f'{exp_name}_features'] = [ans.columns.values for ans in exp_dict[exp_name]['ans']]
-        for exp_name, exp_data in exp_dict.items():
-            analysis_dict_2df[f'{exp_name}_shape'] = exp_data['ans_shape']
-        for exp_name, exp_data in exp_dict.items():
-            analysis_dict_2df[f'{exp_name}_solving_time'] = exp_data['solving_time']
+        for metric in TRACKED_METRICS:
+            if metric != 'd_tag':
+                for exp_name, exp_data in exp_dict.items():
+                    analysis_dict_2df[f"{exp_name}_{metric}"] = exp_data[metric]
+        # for exp_name, exp_data in exp_dict.items():
+        #     analysis_dict_2df['data_shape'] = exp_data['data_shape']
+        # for exp_name, exp_data in exp_dict.items():
+        #     analysis_dict_2df[f'{exp_name}_fdiff'] = exp_data['f_diff']
+        # for exp_name, exp_data in exp_dict.items():
+        #     analysis_dict_2df[f'{exp_name}_score'] = exp_data['ans_score']
+        # for exp_name, exp_data in exp_dict.items():
+        #     analysis_dict_2df[f'{exp_name}_global_sim'] = exp_data['global_sim']
+        # for exp_name, exp_data in exp_dict.items():
+        #     analysis_dict_2df[f'{exp_name}_local_sim'] = exp_data['local_sim']
+        # for exp_name, exp_data in exp_dict.items():
+        #     analysis_dict_2df[f'{exp_name}_local_diff'] = exp_data['local_diff']
+        # for exp_name, exp_data in exp_dict.items():
+        #     analysis_dict_2df[f'{exp_name}_coverage'] = exp_data['coverage']
+        # for exp_name, exp_data in exp_dict.items():
+        #     analysis_dict_2df[f'{exp_name}_shape'] = exp_data['ans_shape']
+        # for exp_name, exp_data in exp_dict.items():
+        #     analysis_dict_2df[f'{exp_name}_solving_time'] = exp_data['solving_time']
         # analysis_dict_2df['GT_score'] = GT_dict['ans_score']
         # analysis_dict_2df['GT_global_sim'] = GT_dict['global_sim']
         # analysis_dict_2df['GT_local_sim'] = GT_dict['local_sim']
@@ -238,14 +236,14 @@ class Main:
             d_tag_size: int = 10,
             time_limit_seconds: int = 120,
             corpus_name: str = "DBSCAN_rc50_pmNone",
-            supervised=True):
+            supervised: bool = True):
         """
         Single entry point - running all the experiments logic
         """
 
         # 0) default value setting
         if f_diff is None or not isinstance(f_diff, list):
-            f_diff = [0, 1]
+            f_diff = ['0', '1']
 
         # 1) prepare IO
         for path in SETUP_FOLDERS:
@@ -261,8 +259,7 @@ class Main:
             # the key for the dict of the meta-data, declare once so will be the same everywhere
             # dict_main_key = 'assoc'
             results_path = os.path.join(RESULTS_FOLDER_PATH, corpus_name)
-            os.makedirs(results_path,
-                        exist_ok=True)
+            os.makedirs(results_path, exist_ok=True)
 
             # Set-up experiment
             print(f"Set-up experiment")
@@ -283,34 +280,53 @@ class Main:
             #                    'params': {},
             #                    'scorer': AfesSum,
             #                    'sim_module': InverseMinSim}}
+            exp_dict = {'knn10_fdiff': {'solver': KnnSolver, 'params': {"k": 10, "f_diff": f_diff}},
+                        'knn10': {'solver': KnnSolver, 'params': {"k": 10}},
+                        }
             print()
+            # exp_dict = {'bf1': {'solver': BruteForceSolver,
+            #                     'params': {'columns': ['0', '1'], 'rows_num': 1},
+            #                     'scorer': AfesSum,
+            #                     'sim_module': InverseEuclideanSim},
+            #             'bf2': {'solver': BruteForceSolver,
+            #                     'params': {'columns': ['0', '1'], 'rows_num': 2},
+            #                     'scorer': AfesSum,
+            #                     'sim_module': InverseEuclideanSim},
+            #             'bf3': {'solver': BruteForceSolver,
+            #                     'params': {'columns': ['0', '1'], 'rows_num': 3},
+            #                     'scorer': AfesSum,
+            #                     'sim_module': InverseEuclideanSim},
+            #             'bf4': {'solver': BruteForceSolver,
+            #                     'params': {'columns': ['0', '1'], 'rows_num': 4},
+            #                     'scorer': AfesSum,
+            #                     'sim_module': InverseEuclideanSim},
+            #             'bf5': {'solver': BruteForceSolver,
+            #                     'params': {'columns': ['0', '1'], 'rows_num': 5},
+            #                     'scorer': AfesSum,
+            #                     'sim_module': InverseEuclideanSim},
+            #             }
             # exp_dict = {'bf': {'solver': BruteForceSolver,
-            #                    'params': {},
+            #                    'params': {'rows': [0, 5, 10, 11, 19, 22, 25, 35, 47],
+            #                               'columns_num': 2},
             #                    'scorer': AfesSum,
             #                    'sim_module': InverseEuclideanSim}}
-            # exp_dict = {'bf': {'solver': BruteForceSolver,
-            #                    'params': {'columns': ['0', '1'], 'rows_num': 10},
-            #                    'scorer': AfesSum,
-            #                    'sim_module': InverseEuclideanSim}}
-            exp_dict = {'bf': {'solver': BruteForceSolver,
-                               'params': {'rows': [0, 5, 10, 11, 19, 22, 25, 35, 47],
-                                          'columns_num': 2},
-                               'scorer': AfesSum,
-                               'sim_module': InverseEuclideanSim}}
             # 0 = [6, 14, 16, 18, 23, 24, 26, 40, 41]
             # 1 = [7, 11, 12, 14, 15, 17, 21, 43, 48]
             # 4 = [0, 5, 10, 11, 19, 22, 25, 35, 47]
 
             for exp_name, exp_data in exp_dict.items():
-                exp_dict[exp_name]['ans'] = []
-                exp_dict[exp_name]['data_shape'] = []
-                exp_dict[exp_name]['ans_shape'] = []
-                exp_dict[exp_name]['ans_score'] = []
-                exp_dict[exp_name]['global_sim'] = []
-                exp_dict[exp_name]['local_sim'] = []
-                exp_dict[exp_name]['local_diff'] = []
-                exp_dict[exp_name]['coverage'] = []
-                exp_dict[exp_name]['solving_time'] = []
+                for metric in TRACKED_METRICS:
+                    exp_data[metric] = []
+                # exp_dict[exp_name]['ans'] = []
+                # exp_dict[exp_name]['data_shape'] = []
+                # exp_dict[exp_name]['ans_shape'] = []
+                # exp_dict[exp_name]['ans_score'] = []
+                # exp_dict[exp_name]['global_sim'] = []
+                # exp_dict[exp_name]['local_sim'] = []
+                # exp_dict[exp_name]['local_diff'] = []
+                # exp_dict[exp_name]['f_diff'] = []
+                # exp_dict[exp_name]['coverage'] = []
+                # exp_dict[exp_name]['solving_time'] = []
 
             # GT_dict = {'ans_score': [], 'global_sim': [], 'local_sim': [], 'local_diff': []}
             # gt_scorer = AfesSum(sim_module=EuclideanSim(), w_gsim=1, w_ldiff=1, w_lsim=1)
@@ -327,7 +343,6 @@ class Main:
                                                                  exp_dict=exp_dict,
                                                                  dict_main_key='assoc',
                                                                  time_limit_seconds=time_limit_seconds,
-                                                                 f_diff=f_diff,
                                                                  save_d_inf=True,
                                                                  results_path=results_path)
 
@@ -371,5 +386,5 @@ if __name__ == '__main__':
              f_diff=None,
              run_experiments=True,
              supervised=True,
-             time_limit_seconds=300,
+             time_limit_seconds=60,
              corpus_name="partial_synthetic")  # DBSCAN_rc50_pmNone

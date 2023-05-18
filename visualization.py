@@ -87,10 +87,7 @@ def project_2d(d_inf, method='tsne', plot=False):
     return proj_data
 
 
-def project_fdiff(file_name, f_diff, method='tsne', plot=True, save=False):
-    # reading the CSV file
-    d_inf = pd.read_csv(file_name)
-
+def project_fdiff(d_inf, f_diff, method='tsne', plot=True, annotate=False, save=False):
     fig, axs = plt.subplots(1, 3, figsize=(12, 6), constrained_layout=True)
     fig.suptitle('Dataset Projection', fontsize=20)
     # axs[0].set_ylabel('AFEX Score')
@@ -104,7 +101,17 @@ def project_fdiff(file_name, f_diff, method='tsne', plot=True, save=False):
     axs[0].scatter(proj_full["x_anom"], proj_full["y_anom"], c='k', label='s')
     axs[0].set_xlabel(f'{method} 1', fontsize=12)
     axs[0].set_ylabel(f'{method} 2', fontsize=12)
-    axs[0].legend()
+    if annotate:
+        for i in range(len(proj_full["x_dtc"])):
+            axs[0].annotate(f"{i}", (proj_full["x_dtc"].values[i], proj_full["y_dtc"].values[i]),
+                            xycoords="axes fraction")
+        for i in range(len(proj_full["x_dt"])):
+            axs[0].annotate(f"{i + len(proj_full['x_dtc'])}",
+                            (proj_full["x_dt"].values[i], proj_full["y_dt"].values[i]),
+                            xycoords="axes fraction")
+        axs[0].annotate(f"{len(d_inf) - 1}", (proj_full["x_anom"], proj_full["y_anom"]), xycoords="axes fraction")
+    else:
+        axs[0].legend()
     axs[0].set_title(f"D - {method} projection", fontsize=16)
 
     proj_fsim = project_2d(d_inf[[f for f in d_inf.columns.values if f not in f_diff]], method=method)
@@ -113,7 +120,17 @@ def project_fdiff(file_name, f_diff, method='tsne', plot=True, save=False):
     axs[1].scatter(proj_fsim["x_anom"], proj_fsim["y_anom"], c='k', label='s')
     axs[1].set_xlabel(f'{method} 1', fontsize=12)
     axs[1].set_ylabel(f'{method} 2', fontsize=12)
-    axs[1].legend()
+    if annotate:
+        for i in range(len(proj_fsim["x_dtc"])):
+            axs[1].annotate(f"{i}", (proj_fsim["x_dtc"].values[i], proj_fsim["y_dtc"].values[i]),
+                            xycoords="axes fraction")
+        for i in range(len(proj_fsim["x_dt"])):
+            axs[1].annotate(f"{i + len(proj_fsim['x_dtc'])}",
+                            (proj_fsim["x_dt"].values[i], proj_fsim["y_dt"].values[i]),
+                            xycoords="axes fraction")
+        axs[1].annotate(f"{len(d_inf) - 1}", (proj_fsim["x_anom"], proj_fsim["y_anom"]), xycoords="axes fraction")
+    else:
+        axs[1].legend()
     axs[1].set_title(f"D[f_sim] = D{[f for f in d_inf.columns.values if f not in f_diff + ['assoc']]} "
                      f"- {method} projection", fontsize=16)
 
@@ -123,7 +140,17 @@ def project_fdiff(file_name, f_diff, method='tsne', plot=True, save=False):
     axs[2].scatter(proj_fdiff["x_anom"], proj_fdiff["y_anom"], c='k', label='s')
     axs[2].set_xlabel(f'{method} 1', fontsize=12)
     axs[2].set_ylabel(f'{method} 2', fontsize=12)
-    axs[2].legend()
+    if annotate:
+        for i in range(len(proj_fdiff["x_dtc"])):
+            axs[2].annotate(f"{i}", (proj_fdiff["x_dtc"].values[i], proj_fdiff["y_dtc"].values[i]),
+                            xycoords="axes fraction")
+        for i in range(len(proj_fdiff["x_dt"])):
+            axs[2].annotate(f"{i + len(proj_fdiff['x_dtc'])}",
+                            (proj_fdiff["x_dt"].values[i], proj_fdiff["y_dt"].values[i]),
+                            xycoords="axes fraction")
+        axs[2].annotate(f"{len(d_inf) - 1}", (proj_fdiff["x_anom"], proj_fdiff["y_anom"]), xycoords="axes fraction")
+    else:
+        axs[2].legend()
     axs[2].set_title(f"D[f_diff] = D{f_diff} - {method} projection", fontsize=16)
 
     if plot:
@@ -133,18 +160,18 @@ def project_fdiff(file_name, f_diff, method='tsne', plot=True, save=False):
     return
 
 
+
 if __name__ == '__main__':
-    # file_name = 'data/DBSCAN_rc50_pmNone/synt_iter4_inf.csv'
+    # file_name = 'data/DBSCAN_rc50_pmNone/synt_iter1_inf.csv'
+    file_name = 'data/DBSCAN_rc50_pmNone_aug/synt_iter1_inf.csv'
     # file_name = 'results/DBSCAN_rc50_pmNone/synt_iter0_inf_obo_inf.csv'
     # file_name = 'data/T_Corpus/arcene.csv'
-    # file_name = 'data/T_Corpus/clinical_1.csv'
-    file_name = 'results/partial_synthetic/synt_iter4_inf_bf_inf.csv'
-    # file_name = 'results/partial_synthetic/synt_iter0_inf_mc_inf.csv'
+    # file_name = 'results/partial_synthetic/synt_iter4_inf_bf_inf.csv'
 
     # reading the CSV file
     dataset = pd.read_csv(file_name)
 
     # scatter_3d(d_inf)
-    f_diff = ['0', '3']
+    f_diff = ['0', '1']
 
-    project_fdiff(file_name, f_diff=f_diff, method='tsne', plot=True, save=False)
+    project_fdiff(d_inf=dataset, f_diff=f_diff, method='tsne', plot=True, annotate=True, save=False)

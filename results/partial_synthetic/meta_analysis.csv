@@ -1,11 +1,18 @@
 ,0
-dataset,synt_iter4_inf
-data_shape,"(50, 5)"
-bf_score,1.1931139151732304
-bf_global_sim,0.7260592115951658
-bf_local_sim,0.8840583726927439
-bf_local_diff,0.6006771385024344
-bf_coverage,0.1836734693877551
-bf_features,['0' '3']
-bf_shape,"(9, 2)"
-bf_solving_time,0.13720029999999994
+dataset,synt_iter0_inf_aug
+knn10_fdiff_best_gs,0.7910641268147198
+knn10_best_gs,0.7910641268147198
+knn10_fdiff_best_ld,0.6889841724804521
+knn10_best_ld,0.6161174885182783
+knn10_fdiff_best_score,1.239174284032716
+knn10_best_score,1.3790282709495028
+knn10_fdiff_f_diff,"['0', '1']"
+knn10_f_diff,"['0', '1', '4', '2', '3']"
+knn10_fdiff_best_ls,0.9330126970453873
+knn10_best_ls,1.0
+knn10_fdiff_f_sim,"['2', '3', '4']"
+knn10_f_sim,[]
+knn10_fdiff_shape,"(10, 2)"
+knn10_shape,"(10, 5)"
+knn10_fdiff_best_cov,0.20408163265306123
+knn10_best_cov,0.20408163265306123

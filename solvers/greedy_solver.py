@@ -14,7 +14,7 @@ from anomaly_detection_algos.anomaly_algo import AnomalyAlgo
 from explanation_analysis.afes.afes_metric import AfesMetric
 
 
-class BruteForceSolver(Solver):
+class GreedySolver(Solver):
     """
     A Brute Force approach for the rows (D') and columns (F_{diff})
     """
@@ -33,8 +33,7 @@ class BruteForceSolver(Solver):
               anomaly_algo: AnomalyAlgo,
               s: list,
               time_limit_seconds: int,
-              scorer: AfesMetric,
-              save_conv=False) -> tuple:
+              scorer: AfesMetric) -> tuple:
         features = d.columns.values
 
         # check what is the best solution
@@ -104,6 +103,8 @@ class BruteForceSolver(Solver):
                               'best_ld': local_diff,
                               'best_cov': coverage}
                     rows_indexes = self.rows
+
+            # print(0)
 
         elif self.columns:
             print('tqdm over d_tag_size')
@@ -179,8 +180,6 @@ class BruteForceSolver(Solver):
                             # self.convert_process["local_diff"].append(local_diff)
                             # self.convert_process["coverage"].append(coverage)
 
-        if save_conv:
-            self.close_convergence_process(time_limit_seconds=time_limit_seconds)
         assoc = np.zeros(len(d), dtype=int)
         assoc[rows_indexes] = 1
 
