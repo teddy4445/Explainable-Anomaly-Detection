@@ -280,31 +280,31 @@ class Main:
             #                    'params': {},
             #                    'scorer': AfesSum,
             #                    'sim_module': InverseMinSim}}
-            exp_dict = {'knn10_fdiff': {'solver': KnnSolver, 'params': {"k": 10, "f_diff": f_diff}},
-                        'knn10': {'solver': KnnSolver, 'params': {"k": 10}},
-                        }
-            print()
-            # exp_dict = {'bf1': {'solver': BruteForceSolver,
-            #                     'params': {'columns': ['0', '1'], 'rows_num': 1},
-            #                     'scorer': AfesSum,
-            #                     'sim_module': InverseEuclideanSim},
-            #             'bf2': {'solver': BruteForceSolver,
-            #                     'params': {'columns': ['0', '1'], 'rows_num': 2},
-            #                     'scorer': AfesSum,
-            #                     'sim_module': InverseEuclideanSim},
-            #             'bf3': {'solver': BruteForceSolver,
-            #                     'params': {'columns': ['0', '1'], 'rows_num': 3},
-            #                     'scorer': AfesSum,
-            #                     'sim_module': InverseEuclideanSim},
-            #             'bf4': {'solver': BruteForceSolver,
-            #                     'params': {'columns': ['0', '1'], 'rows_num': 4},
-            #                     'scorer': AfesSum,
-            #                     'sim_module': InverseEuclideanSim},
-            #             'bf5': {'solver': BruteForceSolver,
-            #                     'params': {'columns': ['0', '1'], 'rows_num': 5},
-            #                     'scorer': AfesSum,
-            #                     'sim_module': InverseEuclideanSim},
+            # exp_dict = {'knn10_fdiff': {'solver': KnnSolver, 'params': {"k": 10, "f_diff": f_diff}},
+            #             'knn10': {'solver': KnnSolver, 'params': {"k": 10}},
             #             }
+            print()
+            exp_dict = {'bf1': {'solver': BruteForceSolver,
+                                'params': {'columns': ['0', '1'], 'rows_num': 1},
+                                'scorer': AfesSum,
+                                'sim_module': InverseEuclideanSim},
+                        'bf2': {'solver': BruteForceSolver,
+                                'params': {'columns': ['0', '1'], 'rows_num': 2},
+                                'scorer': AfesSum,
+                                'sim_module': InverseEuclideanSim},
+                        'bf3': {'solver': BruteForceSolver,
+                                'params': {'columns': ['0', '1'], 'rows_num': 3},
+                                'scorer': AfesSum,
+                                'sim_module': InverseEuclideanSim},
+                        'bf4': {'solver': BruteForceSolver,
+                                'params': {'columns': ['0', '1'], 'rows_num': 4},
+                                'scorer': AfesSum,
+                                'sim_module': InverseEuclideanSim},
+                        'bf5': {'solver': BruteForceSolver,
+                                'params': {'columns': ['0', '1'], 'rows_num': 5},
+                                'scorer': AfesSum,
+                                'sim_module': InverseEuclideanSim},
+                        }
             # exp_dict = {'bf': {'solver': BruteForceSolver,
             #                    'params': {'rows': [0, 5, 10, 11, 19, 22, 25, 35, 47],
             #                               'columns_num': 2},
@@ -317,19 +317,7 @@ class Main:
             for exp_name, exp_data in exp_dict.items():
                 for metric in TRACKED_METRICS:
                     exp_data[metric] = []
-                # exp_dict[exp_name]['ans'] = []
-                # exp_dict[exp_name]['data_shape'] = []
-                # exp_dict[exp_name]['ans_shape'] = []
-                # exp_dict[exp_name]['ans_score'] = []
-                # exp_dict[exp_name]['global_sim'] = []
-                # exp_dict[exp_name]['local_sim'] = []
-                # exp_dict[exp_name]['local_diff'] = []
-                # exp_dict[exp_name]['f_diff'] = []
-                # exp_dict[exp_name]['coverage'] = []
-                # exp_dict[exp_name]['solving_time'] = []
 
-            # GT_dict = {'ans_score': [], 'global_sim': [], 'local_sim': [], 'local_diff': []}
-            # gt_scorer = AfesSum(sim_module=EuclideanSim(), w_gsim=1, w_ldiff=1, w_lsim=1)
             print()
 
             # run experiments
@@ -346,15 +334,7 @@ class Main:
                                                                  save_d_inf=True,
                                                                  results_path=results_path)
 
-                        # gt_score = gt_scorer.compute(d=d_tag, s=anomaly_sample, f_sim=['0', '1'],
-                        #                              f_diff=['2', '3', '4'])
-                        # gt_global_sim, gt_local_sim, gt_local_diff = gt_scorer.compute_parts(d=d_tag, s=anomaly_sample,
-                        #                                                                      f_sim=['0', '1'],
-                        #                                                                      f_diff=['2', '3', '4'])
-                        # GT_dict['ans_score'].append(gt_score)
-                        # GT_dict['global_sim'].append(gt_global_sim)
-                        # GT_dict['local_sim'].append(gt_local_sim)
-                        # GT_dict['local_diff'].append(gt_local_diff)
+
                     else:
                         exp_dict = Main.solve_unsupervised_dataset(filename=filename,
                                                                    exp_dict=exp_dict,

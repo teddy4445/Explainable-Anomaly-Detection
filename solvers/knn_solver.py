@@ -1,14 +1,11 @@
 # library imports
 import itertools
-
 import numpy as np
 import pandas as pd
 from time import time
 from sklearn.neighbors import KNeighborsRegressor
 
 # project imports
-from tqdm import tqdm
-
 from solvers.solver import Solver
 from anomaly_detection_algos.anomaly_algo import AnomalyAlgo
 from explanation_analysis.afes.afes_metric import AfesMetric
@@ -36,7 +33,7 @@ class KnnSolver(Solver):
               save_conv=False) -> tuple:
         features = d.columns.values
 
-        # run KNN and find top-k
+        # Run KNN and find top-k
         knn = KNeighborsRegressor(n_neighbors=self._k)
         knn.fit(X=d, y=list(range(d.shape[0])))  # the y is useless so we just put indexes, it can be any value
         rows_indexes = knn.kneighbors(X=[s], n_neighbors=self._k, return_distance=False)[0]
@@ -46,7 +43,6 @@ class KnnSolver(Solver):
         if self.f_diff:
             ans_fdiff = self.f_diff
             f_sim = [feature for feature in features if feature not in ans_fdiff]
-
             best_ans_score = scorer.compute(d=d_tag_full_f, s=s, f_sim=f_sim, f_diff=ans_fdiff, overall_size=len(d))
             global_sim, local_sim, local_diff, coverage = scorer.compute_parts(d=d_tag_full_f, s=s,
                                                                                f_sim=f_sim, f_diff=ans_fdiff,
@@ -64,18 +60,12 @@ class KnnSolver(Solver):
 
             # save conversion process
             if save_conv:
-                self.convert_process["time"].append(time() - start_time)
-                self.convert_process["rows_indexes"].append(rows_indexes)
-                self.convert_process["cols_indexes"].append(self.f_diff)
-                self.convert_process["shape"].append([len(rows_indexes), len(self.f_diff)])
-                self.convert_process["score"].append(best_ans_score)
-                self.convert_process["global_sim"].append(global_sim)
-                self.convert_process["local_sim"].append(local_sim)
-                self.convert_process["local_diff"].append(local_diff)
-                self.convert_process["coverage"].append(coverage)
+                self._save_conversion_process(start_time, rows_indexes, self.f_diff,
+                                              (len(rows_indexes), len(self.f_diff)),
+                                              best_ans_score, global_sim, local_sim, local_diff, coverage)
 
         else:
-            best_ans_score = -99999999
+            best_ans_score = float('-inf')
 
             # run until the time is over
             # while (time() - start_time) < time_limit_seconds or best_ans is None:
@@ -84,7 +74,6 @@ class KnnSolver(Solver):
                 for cols_indexes in subsets_cols:
                     f_diff = list(cols_indexes)
                     f_sim = [feature for feature in features if feature not in f_diff]
-                    # score it
                     score = scorer.compute(d=d_tag_full_f, s=s, f_sim=f_sim, f_diff=f_diff, overall_size=len(d))
                     global_sim, local_sim, local_diff, coverage = scorer.compute_parts(d=d_tag_full_f, s=s,
                                                                                        f_sim=f_sim, f_diff=f_diff,
@@ -105,15 +94,9 @@ class KnnSolver(Solver):
 
                     # save conversion process
                     if save_conv:
-                        self.convert_process["time"].append(time() - start_time)
-                        self.convert_process["rows_indexes"].append(rows_indexes)
-                        self.convert_process["cols_indexes"].append(cols_indexes)
-                        self.convert_process["shape"].append([len(rows_indexes), len(cols_indexes)])
-                        self.convert_process["score"].append(score)
-                        self.convert_process["global_sim"].append(global_sim)
-                        self.convert_process["local_sim"].append(local_sim)
-                        self.convert_process["local_diff"].append(local_diff)
-                        self.convert_process["coverage"].append(coverage)
+                        self._save_conversion_process(start_time, rows_indexes, cols_indexes,
+                                                      (len(rows_indexes), len(cols_indexes)),
+                                                      score, global_sim, local_sim, local_diff, coverage)
 
         if save_conv:
             self.close_convergence_process(time_limit_seconds=time_limit_seconds)
@@ -122,3 +105,18 @@ class KnnSolver(Solver):
 
         # return the best so far
         return solution, list(assoc)
+
+    def _save_conversion_process(self, start_time, rows_indexes, cols_indexes, shape, score, global_sim, local_sim,
+                                 local_diff, coverage):
+        """
+        Save the conversion process.
+        """
+        self.convert_process["time"].append(time() - start_time)
+        self.convert_process["rows_indexes"].append(rows_indexes)
+        self.convert_process["cols_indexes"].append(cols_indexes)
+        self.convert_process["shape"].append(shape)
+        self.convert_process["score"].append(score)
+        self.convert_process["global_sim"].append(global_sim)
+        self.convert_process["local_sim"].append(local_sim)
+        self.convert_process["local_diff"].append(local_diff)
+        self.convert_process["coverage"].append(coverage)

@@ -163,10 +163,8 @@ def project_fdiff(d_inf, f_diff, method='tsne', plot=True, annotate=False, save=
 
 if __name__ == '__main__':
     # file_name = 'data/DBSCAN_rc50_pmNone/synt_iter1_inf.csv'
-    file_name = 'data/DBSCAN_rc50_pmNone_aug/synt_iter1_inf.csv'
-    # file_name = 'results/DBSCAN_rc50_pmNone/synt_iter0_inf_obo_inf.csv'
-    # file_name = 'data/T_Corpus/arcene.csv'
-    # file_name = 'results/partial_synthetic/synt_iter4_inf_bf_inf.csv'
+    # file_name = 'data/DBSCAN_rc50_pmNone_aug/synt_iter1_inf.csv'
+    file_name = 'results/partial_synthetic/synt_iter0_inf_aug_bf2_inf.csv'
 
     # reading the CSV file
     dataset = pd.read_csv(file_name)

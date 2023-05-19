@@ -1,18 +1,18 @@
 ,0
 dataset,synt_iter0_inf_aug
-knn10_fdiff_best_gs,0.7910641268147198
-knn10_best_gs,0.7910641268147198
-knn10_fdiff_best_ld,0.6889841724804521
-knn10_best_ld,0.6161174885182783
-knn10_fdiff_best_score,1.239174284032716
-knn10_best_score,1.3790282709495028
-knn10_fdiff_f_diff,"['0', '1']"
-knn10_f_diff,"['0', '1', '4', '2', '3']"
-knn10_fdiff_best_ls,0.9330126970453873
-knn10_best_ls,1.0
-knn10_fdiff_f_sim,"['2', '3', '4']"
-knn10_f_sim,[]
-knn10_fdiff_shape,"(10, 2)"
-knn10_shape,"(10, 5)"
-knn10_fdiff_best_cov,0.20408163265306123
-knn10_best_cov,0.20408163265306123
+bf1_shape,"(1, 2)"
+bf2_shape,"(2, 2)"
+bf1_best_gs,0.0
+bf2_best_gs,0.9655104668279174
+bf1_best_ld,0.49430768663144925
+bf2_best_ld,0.49285711241515406
+bf1_best_ls,0.9330126970453873
+bf2_best_ls,0.8457589165924723
+bf1_f_sim,"['2', '3', '4']"
+bf2_f_sim,"['2', '3', '4']"
+bf1_f_diff,"['0', '1']"
+bf2_f_diff,"['0', '1']"
+bf1_best_cov,0.02040816326530612
+bf2_best_cov,0.04081632653061224
+bf1_best_score,0.45911317367924415
+bf2_best_score,1.3592285975358478
