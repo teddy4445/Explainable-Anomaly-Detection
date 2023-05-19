@@ -17,6 +17,7 @@ from experiments.experiment import Experiment, TRACKED_METRICS
 from experiments.experiment_properties.feature_distribution_normal import FeatureDistributionNormal
 from experiments.synthetic_dataset_generation import SyntheticDatasetGeneration
 from solvers.bf_solver import BruteForceSolver
+from solvers.greedy_solver import GreedySolver
 from solvers.knn_solver import KnnSolver
 from solvers.mc_solver import MonteCarloSolver
 from solvers.one_ones_solver import OneOneSolver
@@ -234,8 +235,8 @@ class Main:
             print(f"Set-up experiment")
             file_names = []
 
-            exp_dict = {'knn5_fdiff': {'solver': KnnSolver, 'params': {"k": 5, "f_diff": f_diff}},
-                        'knn5': {'solver': KnnSolver, 'params': {"k": 5}},
+            exp_dict = {# 'knn5_fdiff': {'solver': KnnSolver, 'params': {"k": 5, "f_diff": f_diff}},
+                        # 'knn5': {'solver': KnnSolver, 'params': {"k": 5}},
                         # 'knn10_fdiff': {'solver': KnnSolver, 'params': {"k": 10, "f_diff": f_diff}},
                         # 'knn10': {'solver': KnnSolver, 'params': {"k": 10}},
                         # 'knn15_fdiff': {'solver': KnnSolver, 'params': {"k": 15, "f_diff": f_diff}},
@@ -246,6 +247,7 @@ class Main:
                         # 'bf3': {'solver': BruteForceSolver, 'params': {'columns': ['0', '1'], 'rows_num': 3}},
                         # 'bf4': {'solver': BruteForceSolver, 'params': {'columns': ['0', '1'], 'rows_num': 4}},
                         # 'bf5': {'solver': BruteForceSolver, 'params': {'columns': ['0', '1'], 'rows_num': 5}},
+                        'greedy': {'solver': GreedySolver, 'params': {}},
                         }
 
             for exp_name, exp_data in exp_dict.items():
@@ -280,7 +282,7 @@ class Main:
             print('Save experiments metadata')
             analysis_dict_2df = {'dataset': file_names}
             analysis_df = Main.save_metadata(analysis_dict_2df=analysis_dict_2df, exp_dict=exp_dict)
-            analysis_df.T.to_csv(os.path.join(results_path, "meta_analysis_knn.csv"), index=True)
+            analysis_df.T.to_csv(os.path.join(results_path, "meta_analysis_greedy.csv"), index=True)
 
 
 if __name__ == '__main__':

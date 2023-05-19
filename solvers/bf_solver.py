@@ -52,9 +52,9 @@ class BruteForceSolver(Solver):
                 ans = d.loc[rows_indexes]
                 # score it
                 score = scorer.compute(d=ans, s=s, f_sim=f_sim, f_diff=self.columns, overall_size=len(d))
-                global_sim, local_sim, local_diff, coverage = scorer.compute_parts(d=ans, s=s, f_sim=f_sim,
-                                                                                   f_diff=self.columns,
-                                                                                   overall_size=len(d))
+                self_sim, local_sim, local_diff, coverage = scorer.compute_parts(d=ans, s=s, f_sim=f_sim,
+                                                                                 f_diff=self.columns,
+                                                                                 overall_size=len(d))
 
                 # if best so far, replace and record
                 if score > best_ans_score:
@@ -64,7 +64,7 @@ class BruteForceSolver(Solver):
                                 'f_diff': self.columns,
                                 'f_sim': f_sim,
                                 'best_score': score,
-                                'best_ss': global_sim,
+                                'best_ss': self_sim,
                                 'best_ls': local_sim,
                                 'best_ld': local_diff,
                                 'best_cov': coverage}
@@ -83,7 +83,7 @@ class BruteForceSolver(Solver):
         #                                                   feature not in cols_indexes],
         #                                f_diff=cols_indexes,
         #                                overall_size=len(d))
-        #         global_sim, local_sim, local_diff, coverage = scorer.compute_parts(d=ans, s=s,
+        #         self_sim, local_sim, local_diff, coverage = scorer.compute_parts(d=ans, s=s,
         #                                                                            f_sim=[feature for
         #                                                                                   feature in
         #                                                                                   features
@@ -97,7 +97,7 @@ class BruteForceSolver(Solver):
         #             best_ans_score = score
         #             best_ans = ans[cols_indexes]
         #             scores = {'best_score': score,
-        #                       'bests': global_sim,
+        #                       'best_ss': self_sim,
         #                       'best_ls': local_sim,
         #                       'best_ld': local_diff,
         #                       'best_cov': coverage}
@@ -115,7 +115,7 @@ class BruteForceSolver(Solver):
         #                                    f_diff=[feature for feature in features if
         #                                            feature not in self.columns],
         #                                    overall_size=len(d))
-        #             global_sim, local_sim, local_diff, coverage = scorer.compute_parts(d=ans, s=s,
+        #             self_sim, local_sim, local_diff, coverage = scorer.compute_parts(d=ans, s=s,
         #                                                                                f_sim=self.columns,
         #                                                                                f_diff=[feature for feature in
         #                                                                                        features
@@ -128,7 +128,7 @@ class BruteForceSolver(Solver):
         #                 # best_score = score
         #                 best_ans = ans
         #                 scores = {'best_score': score,
-        #                           'best_ss': global_sim,
+        #                           'best_ss': self_sim,
         #                           'best_ls': local_sim,
         #                           'best_ld': local_diff,
         #                           'best_cov': coverage}
@@ -148,7 +148,7 @@ class BruteForceSolver(Solver):
         #                                            f_diff=[feature for feature in features if
         #                                                    feature not in cols_indexes],
         #                                            overall_size=len(d))
-        #                     global_sim, local_sim, local_diff, coverage = scorer.compute_parts(d=ans, s=s,
+        #                     self_sim, local_sim, local_diff, coverage = scorer.compute_parts(d=ans, s=s,
         #                                                                                        f_sim=cols_indexes,
         #                                                                                        f_diff=[feature for
         #                                                                                                feature in
@@ -162,7 +162,7 @@ class BruteForceSolver(Solver):
         #                         # best_score = score
         #                         best_ans = ans
         #                         scores = {'best_score': score,
-        #                                   'best_ss': global_sim,
+        #                                   'best_ss': self_sim,
         #                                   'best_ls': local_sim,
         #                                   'best_ld': local_diff,
         #                                   'best_cov': coverage}
@@ -172,7 +172,7 @@ class BruteForceSolver(Solver):
         #                     # self.convert_process["cols_indexes"].append(cols_indexes)
         #                     # self.convert_process["shape"].append([len(rows_indexes), len(cols_indexes)])
         #                     # self.convert_process["score"].append(best_ans_score)
-        #                     # self.convert_process["global_sim"].append(global_sim)
+        #                     # self.convert_process["self_sim"].append(self_sim)
         #                     # self.convert_process["local_sim"].append(local_sim)
         #                     # self.convert_process["local_diff"].append(local_diff)
         #                     # self.convert_process["coverage"].append(coverage)

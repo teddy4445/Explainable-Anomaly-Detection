@@ -164,7 +164,7 @@ def project_fdiff(d_inf, f_diff, method='tsne', plot=True, annotate=False, save=
 if __name__ == '__main__':
     # file_name = 'data/DBSCAN_rc50_pmNone/synt_iter1_inf.csv'
     # file_name = 'data/DBSCAN_rc50_pmNone_aug/synt_iter1_inf.csv'
-    # file_name = 'results/partial_synthetic/synt_iter0_inf_aug_bf5_inf.csv'
+    # file_name = 'results/partial_synthetic/synt_iter0_inf_aug_bf2_inf.csv'
     file_name = 'results/partial_synthetic/synt_iter0_inf_aug_knn5_inf.csv'
 
     # reading the CSV file
@@ -172,6 +172,6 @@ if __name__ == '__main__':
 
     # scatter_3d(d_inf)
     f_diff = ['0', '1']
-    # f_diff = ['0', '1', '2', '3', '4']
+    # f_diff = ['0', '1', '2', '4']
 
     project_fdiff(d_inf=dataset, f_diff=f_diff, method='tsne', plot=True, annotate=False, save=False)

@@ -36,6 +36,10 @@ class InverseMinSim(SimMetric):
         if len(dist_array) == 0:
             return 0
         if mode == 'sim':
+            if len(features) == 0:
+                return 0
             return 1 / (1 + np.max(dist_array))
         elif mode == 'diff':
+            if len(features) == 0:
+                return 1
             return 1 / (1 + np.min(dist_array))

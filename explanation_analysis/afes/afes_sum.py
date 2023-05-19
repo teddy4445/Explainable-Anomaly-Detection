@@ -42,6 +42,8 @@ class AfesSum(AfesMetric):
                       f_sim: list,
                       f_diff: list):
         plain_d = d.reset_index(drop=True)
+        if len(d) == 0:
+            print()
         self_sim = self._w_gsim * 1 / len(d) * sum(
             self.sim_module.sim(d=pd.concat([plain_d.iloc[:index], plain_d.iloc[index + 1:]], ignore_index=True), s=row,
                                 features=d.columns.values, mode='sim') for index, row in plain_d.iterrows())
