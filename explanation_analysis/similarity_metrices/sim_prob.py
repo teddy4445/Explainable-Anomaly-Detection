@@ -14,7 +14,8 @@ class ProbSim(SimMetric):
     def sim(self,
             d: list | pd.pd.DataFrame,
             s: list | pd.pd.Series,
-            features: list):
+            features: list,
+            mode: str):
         reduced_d = d.copy()
         for feature in features:
             reduced_d = reduced_d.loc[reduced_d[feature] == s[feature]]

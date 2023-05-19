@@ -109,15 +109,6 @@ class Main:
             # exp_dict[exp_name]['data_shape'].append(dataset.shape)
             for metric in TRACKED_METRICS:
                 exp_dict[exp_name][metric].append(curr_exp.results[metric])
-            # exp_dict[exp_name]['ans'].append(curr_exp.results['best_ans'])
-            # exp_dict[exp_name]['ans_shape'].append(curr_exp.results['best_ans'].shape)
-            # exp_dict[exp_name]['f_diff'].append(curr_exp.results['f_diff'])
-            # exp_dict[exp_name]['ans_score'].append(curr_exp.results['scores']['best_score'])
-            # exp_dict[exp_name]['solving_time'].append(curr_exp.results['solving_time'])
-            # exp_dict[exp_name]['global_sim'].append(curr_exp.results['scores']['best_gs'])
-            # exp_dict[exp_name]['local_sim'].append(curr_exp.results['scores']['best_ls'])
-            # exp_dict[exp_name]['local_diff'].append(curr_exp.results['scores']['best_ld'])
-            # exp_dict[exp_name]['coverage'].append(curr_exp.results['scores']['best_cov'])
 
             if save_d_inf:
                 curr_exp.results['d_inf'].to_csv(os.path.join(results_path,
@@ -202,28 +193,6 @@ class Main:
             if metric != 'd_tag':
                 for exp_name, exp_data in exp_dict.items():
                     analysis_dict_2df[f"{exp_name}_{metric}"] = exp_data[metric]
-        # for exp_name, exp_data in exp_dict.items():
-        #     analysis_dict_2df['data_shape'] = exp_data['data_shape']
-        # for exp_name, exp_data in exp_dict.items():
-        #     analysis_dict_2df[f'{exp_name}_fdiff'] = exp_data['f_diff']
-        # for exp_name, exp_data in exp_dict.items():
-        #     analysis_dict_2df[f'{exp_name}_score'] = exp_data['ans_score']
-        # for exp_name, exp_data in exp_dict.items():
-        #     analysis_dict_2df[f'{exp_name}_global_sim'] = exp_data['global_sim']
-        # for exp_name, exp_data in exp_dict.items():
-        #     analysis_dict_2df[f'{exp_name}_local_sim'] = exp_data['local_sim']
-        # for exp_name, exp_data in exp_dict.items():
-        #     analysis_dict_2df[f'{exp_name}_local_diff'] = exp_data['local_diff']
-        # for exp_name, exp_data in exp_dict.items():
-        #     analysis_dict_2df[f'{exp_name}_coverage'] = exp_data['coverage']
-        # for exp_name, exp_data in exp_dict.items():
-        #     analysis_dict_2df[f'{exp_name}_shape'] = exp_data['ans_shape']
-        # for exp_name, exp_data in exp_dict.items():
-        #     analysis_dict_2df[f'{exp_name}_solving_time'] = exp_data['solving_time']
-        # analysis_dict_2df['GT_score'] = GT_dict['ans_score']
-        # analysis_dict_2df['GT_global_sim'] = GT_dict['global_sim']
-        # analysis_dict_2df['GT_local_sim'] = GT_dict['local_sim']
-        # analysis_dict_2df['GT_local_diff'] = GT_dict['local_diff']
         return pd.DataFrame(analysis_dict_2df)
 
     @staticmethod
@@ -265,54 +234,19 @@ class Main:
             print(f"Set-up experiment")
             file_names = []
 
-            # exp_dict = {'knn5': {'solver': KnnSolver, 'params': {"k": 5}},
-            #             'knn10': {'solver': KnnSolver, 'params': {"k": 10}},
-            #             'knn15': {'solver': KnnSolver, 'params': {"k": 15}},
-            #             'mc': {'solver': MonteCarloSolver, 'params': {}},
-            #             'obo': {'solver': OneOneSolver,
-            #                     'params': {"d_tag_size": d_tag_size, "f_diff_size": len(f_diff)}}
-            #             }
-            # exp_dict = {'mc': {'solver': MonteCarloSolver,
-            #                    'params': {},
-            #                    'scorer': AfesSum,
-            #                    'sim_module': InverseEuclideanSim}}
-            # exp_dict = {'mc': {'solver': MonteCarloSolver,
-            #                    'params': {},
-            #                    'scorer': AfesSum,
-            #                    'sim_module': InverseMinSim}}
-            # exp_dict = {'knn10_fdiff': {'solver': KnnSolver, 'params': {"k": 10, "f_diff": f_diff}},
-            #             'knn10': {'solver': KnnSolver, 'params': {"k": 10}},
-            #             }
-            print()
-            exp_dict = {'bf1': {'solver': BruteForceSolver,
-                                'params': {'columns': ['0', '1'], 'rows_num': 1},
-                                'scorer': AfesSum,
-                                'sim_module': InverseEuclideanSim},
-                        'bf2': {'solver': BruteForceSolver,
-                                'params': {'columns': ['0', '1'], 'rows_num': 2},
-                                'scorer': AfesSum,
-                                'sim_module': InverseEuclideanSim},
-                        'bf3': {'solver': BruteForceSolver,
-                                'params': {'columns': ['0', '1'], 'rows_num': 3},
-                                'scorer': AfesSum,
-                                'sim_module': InverseEuclideanSim},
-                        'bf4': {'solver': BruteForceSolver,
-                                'params': {'columns': ['0', '1'], 'rows_num': 4},
-                                'scorer': AfesSum,
-                                'sim_module': InverseEuclideanSim},
-                        'bf5': {'solver': BruteForceSolver,
-                                'params': {'columns': ['0', '1'], 'rows_num': 5},
-                                'scorer': AfesSum,
-                                'sim_module': InverseEuclideanSim},
+            exp_dict = {'knn5_fdiff': {'solver': KnnSolver, 'params': {"k": 5, "f_diff": f_diff}},
+                        'knn5': {'solver': KnnSolver, 'params': {"k": 5}},
+                        # 'knn10_fdiff': {'solver': KnnSolver, 'params': {"k": 10, "f_diff": f_diff}},
+                        # 'knn10': {'solver': KnnSolver, 'params': {"k": 10}},
+                        # 'knn15_fdiff': {'solver': KnnSolver, 'params': {"k": 15, "f_diff": f_diff}},
+                        # 'knn15': {'solver': KnnSolver, 'params': {"k": 15}},
+                        # 'mc': {'solver': MonteCarloSolver, 'params': {}},
+                        # 'bf1': {'solver': BruteForceSolver, 'params': {'columns': ['0', '1'], 'rows_num': 1}},
+                        # 'bf2': {'solver': BruteForceSolver, 'params': {'columns': ['0', '1'], 'rows_num': 2}},
+                        # 'bf3': {'solver': BruteForceSolver, 'params': {'columns': ['0', '1'], 'rows_num': 3}},
+                        # 'bf4': {'solver': BruteForceSolver, 'params': {'columns': ['0', '1'], 'rows_num': 4}},
+                        # 'bf5': {'solver': BruteForceSolver, 'params': {'columns': ['0', '1'], 'rows_num': 5}},
                         }
-            # exp_dict = {'bf': {'solver': BruteForceSolver,
-            #                    'params': {'rows': [0, 5, 10, 11, 19, 22, 25, 35, 47],
-            #                               'columns_num': 2},
-            #                    'scorer': AfesSum,
-            #                    'sim_module': InverseEuclideanSim}}
-            # 0 = [6, 14, 16, 18, 23, 24, 26, 40, 41]
-            # 1 = [7, 11, 12, 14, 15, 17, 21, 43, 48]
-            # 4 = [0, 5, 10, 11, 19, 22, 25, 35, 47]
 
             for exp_name, exp_data in exp_dict.items():
                 for metric in TRACKED_METRICS:
@@ -334,7 +268,6 @@ class Main:
                                                                  save_d_inf=True,
                                                                  results_path=results_path)
 
-
                     else:
                         exp_dict = Main.solve_unsupervised_dataset(filename=filename,
                                                                    exp_dict=exp_dict,
@@ -347,7 +280,7 @@ class Main:
             print('Save experiments metadata')
             analysis_dict_2df = {'dataset': file_names}
             analysis_df = Main.save_metadata(analysis_dict_2df=analysis_dict_2df, exp_dict=exp_dict)
-            analysis_df.T.to_csv(os.path.join(results_path, "meta_analysis.csv"), index=True)
+            analysis_df.T.to_csv(os.path.join(results_path, "meta_analysis_knn.csv"), index=True)
 
 
 if __name__ == '__main__':

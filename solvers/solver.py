@@ -19,7 +19,7 @@ class Solver:
             "rows_indexes": [],
             "f_diff": [],
             "shape": [],
-            "global_sim": [],
+            "self_sim": [],
             "local_sim": [],
             "local_diff": [],
             "coverage": [],

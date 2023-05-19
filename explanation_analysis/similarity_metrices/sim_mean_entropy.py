@@ -16,7 +16,8 @@ class MeanEntropySim(SimMetric):
     def sim(self,
             d: list | pd.DataFrame,
             s: list | pd.Series,
-            features: list):
+            features: list,
+            mode: str):
         if isinstance(s, pd.Series):
             s = s[features].values
         elif isinstance(s, list):

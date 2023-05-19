@@ -43,15 +43,15 @@ if __name__ == '__main__':
     f_sim = ['2', '3', '4']
 
     # first view
-    # project_fdiff(d_inf=dataset, f_diff=f_diff, method='tsne', plot=True, annotate=True, save=False)
+    project_fdiff(d_inf=dataset, f_diff=f_diff, method='tsne', plot=True, annotate=False, save=False)
 
     # augment dataset
     dataset_aug = move_cluster(dataset=dataset, target_assoc=2, features=f_diff, factor=1)
     dataset_aug = move_cluster(dataset=dataset_aug, target_assoc=1, features=f_diff, factor=0.2)
     dataset_aug = move_cluster(dataset=dataset_aug, target_assoc=2, features=f_sim, factor=0.5)
     dataset_aug = move_cluster(dataset=dataset_aug, target_assoc=1, features=f_sim, factor=1)
-    # project_fdiff(d_inf=dataset_aug, f_diff=f_diff, method='tsne', plot=True, annotate=False, save=False)
+    project_fdiff(d_inf=dataset_aug, f_diff=f_diff, method='tsne', plot=True, annotate=False, save=False)
 
     # save new dataset
     saving_directory = 'partial_synthetic'
-    dataset_aug.to_csv(f'data/{saving_directory}/{dataset_name}_aug.csv', index=False)
+    # dataset_aug.to_csv(f'data/{saving_directory}/{dataset_name}_aug.csv', index=False)

@@ -8,7 +8,7 @@ from solvers.solver import Solver
 from explanation_analysis.afes.afes_metric import AfesMetric
 from anomaly_detection_algos.anomaly_algo import AnomalyAlgo
 
-TRACKED_METRICS = {'d_tag', 'shape', 'f_diff', 'f_sim', 'best_score', 'best_gs', 'best_ls', 'best_ld', 'best_cov'}
+TRACKED_METRICS = {'d_tag', 'shape', 'f_diff', 'f_sim', 'best_score', 'best_ss', 'best_ls', 'best_ld', 'best_cov'}
 
 
 class Experiment:
@@ -25,7 +25,7 @@ class Experiment:
                         'f_diff': None,
                         'f_sim': None,
                         'best_score': None,
-                        'best_gs': None,
+                        'best_ss': None,
                         'best_ls': None,
                         'best_ld': None,
                         'best_cov': None}

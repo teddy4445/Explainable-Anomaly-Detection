@@ -18,7 +18,8 @@ class InverseEuclideanSim(SimMetric):
     def sim(self,
             d: list | pd.DataFrame,
             s: list | pd.Series,
-            features: list):
+            features: list,
+            mode: str):
         if isinstance(s, pd.Series):
             s = s[features].values
         if isinstance(d, pd.DataFrame):

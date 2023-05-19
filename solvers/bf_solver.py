@@ -64,7 +64,7 @@ class BruteForceSolver(Solver):
                                 'f_diff': self.columns,
                                 'f_sim': f_sim,
                                 'best_score': score,
-                                'best_gs': global_sim,
+                                'best_ss': global_sim,
                                 'best_ls': local_sim,
                                 'best_ld': local_diff,
                                 'best_cov': coverage}
@@ -97,7 +97,7 @@ class BruteForceSolver(Solver):
         #             best_ans_score = score
         #             best_ans = ans[cols_indexes]
         #             scores = {'best_score': score,
-        #                       'best_gs': global_sim,
+        #                       'bests': global_sim,
         #                       'best_ls': local_sim,
         #                       'best_ld': local_diff,
         #                       'best_cov': coverage}
@@ -128,7 +128,7 @@ class BruteForceSolver(Solver):
         #                 # best_score = score
         #                 best_ans = ans
         #                 scores = {'best_score': score,
-        #                           'best_gs': global_sim,
+        #                           'best_ss': global_sim,
         #                           'best_ls': local_sim,
         #                           'best_ld': local_diff,
         #                           'best_cov': coverage}
@@ -162,7 +162,7 @@ class BruteForceSolver(Solver):
         #                         # best_score = score
         #                         best_ans = ans
         #                         scores = {'best_score': score,
-        #                                   'best_gs': global_sim,
+        #                                   'best_ss': global_sim,
         #                                   'best_ls': local_sim,
         #                                   'best_ld': local_diff,
         #                                   'best_cov': coverage}

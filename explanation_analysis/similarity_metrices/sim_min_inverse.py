@@ -18,7 +18,8 @@ class InverseMinSim(SimMetric):
     def sim(self,
             d: list | pd.DataFrame,
             s: list | pd.Series,
-            features: list):
+            features: list,
+            mode: str):
         if isinstance(s, pd.Series):
             s = s[features].to_numpy()
         if isinstance(d, pd.DataFrame):
@@ -34,4 +35,7 @@ class InverseMinSim(SimMetric):
         # at this stage both 's' and 'd' are lists
         if len(dist_array) == 0:
             return 0
-        return 1 / (1 + np.min(dist_array))
+        if mode == 'sim':
+            return 1 / (1 + np.max(dist_array))
+        elif mode == 'diff':
+            return 1 / (1 + np.min(dist_array))

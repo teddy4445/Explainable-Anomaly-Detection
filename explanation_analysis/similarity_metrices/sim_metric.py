@@ -14,5 +14,6 @@ class SimMetric:
     def sim(self,
             d: list | pd.DataFrame,
             s: list | pd.pd.Series,
-            features: list):
+            features: list,
+            mode: str):
         pass
