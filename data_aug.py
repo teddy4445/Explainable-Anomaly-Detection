@@ -32,7 +32,7 @@ def move_cluster(dataset, target_assoc, features, factor):
 
 
 if __name__ == '__main__':
-    dataset_name = 'synt_iter0_inf'
+    dataset_name = 'synt_iter6_inf'
     file_name = f'data/DBSCAN_rc50_pmNone_aug/{dataset_name}.csv'
 
     # reading the CSV file
@@ -47,8 +47,8 @@ if __name__ == '__main__':
 
     # augment dataset
     dataset_aug = move_cluster(dataset=dataset, target_assoc=2, features=f_diff, factor=1)
-    dataset_aug = move_cluster(dataset=dataset_aug, target_assoc=1, features=f_diff, factor=0.2)
-    dataset_aug = move_cluster(dataset=dataset_aug, target_assoc=2, features=f_sim, factor=0.5)
+    dataset_aug = move_cluster(dataset=dataset_aug, target_assoc=1, features=f_diff, factor=0.3)
+    dataset_aug = move_cluster(dataset=dataset_aug, target_assoc=2, features=f_sim, factor=0.3)
     dataset_aug = move_cluster(dataset=dataset_aug, target_assoc=1, features=f_sim, factor=1)
     project_fdiff(d_inf=dataset_aug, f_diff=f_diff, method='tsne', plot=True, annotate=False, save=False)
 

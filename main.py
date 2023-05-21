@@ -235,20 +235,21 @@ class Main:
             print(f"Set-up experiment")
             file_names = []
 
-            exp_dict = {# 'knn5_fdiff': {'solver': KnnSolver, 'params': {"k": 5, "f_diff": f_diff}},
-                        # 'knn5': {'solver': KnnSolver, 'params': {"k": 5}},
-                        # 'knn10_fdiff': {'solver': KnnSolver, 'params': {"k": 10, "f_diff": f_diff}},
-                        # 'knn10': {'solver': KnnSolver, 'params': {"k": 10}},
-                        # 'knn15_fdiff': {'solver': KnnSolver, 'params': {"k": 15, "f_diff": f_diff}},
-                        # 'knn15': {'solver': KnnSolver, 'params': {"k": 15}},
-                        # 'mc': {'solver': MonteCarloSolver, 'params': {}},
-                        # 'bf1': {'solver': BruteForceSolver, 'params': {'columns': ['0', '1'], 'rows_num': 1}},
-                        # 'bf2': {'solver': BruteForceSolver, 'params': {'columns': ['0', '1'], 'rows_num': 2}},
-                        # 'bf3': {'solver': BruteForceSolver, 'params': {'columns': ['0', '1'], 'rows_num': 3}},
-                        # 'bf4': {'solver': BruteForceSolver, 'params': {'columns': ['0', '1'], 'rows_num': 4}},
-                        # 'bf5': {'solver': BruteForceSolver, 'params': {'columns': ['0', '1'], 'rows_num': 5}},
-                        'greedy': {'solver': GreedySolver, 'params': {}},
-                        }
+            exp_dict = {
+                # 'knn5_fdiff': {'solver': KnnSolver, 'params': {"k": 5, "f_diff": f_diff}},
+                # 'knn5': {'solver': KnnSolver, 'params': {"k": 5}},
+                # 'knn10_fdiff': {'solver': KnnSolver, 'params': {"k": 10, "f_diff": f_diff}},
+                # 'knn10': {'solver': KnnSolver, 'params': {"k": 10}},
+                # 'knn15_fdiff': {'solver': KnnSolver, 'params': {"k": 15, "f_diff": f_diff}},
+                # 'knn15': {'solver': KnnSolver, 'params': {"k": 15}},
+                # 'mc': {'solver': MonteCarloSolver, 'params': {}},
+                # 'bf1': {'solver': BruteForceSolver, 'params': {'columns': ['0', '1'], 'rows_num': 1}},
+                # 'bf2': {'solver': BruteForceSolver, 'params': {'columns': ['0', '1'], 'rows_num': 2}},
+                # 'bf3': {'solver': BruteForceSolver, 'params': {'columns': ['0', '1'], 'rows_num': 3}},
+                # 'bf4': {'solver': BruteForceSolver, 'params': {'columns': ['0', '1'], 'rows_num': 4}},
+                # 'bf5': {'solver': BruteForceSolver, 'params': {'columns': ['0', '1'], 'rows_num': 5}},
+                'greedy': {'solver': GreedySolver, 'params': {'depth': 5}},
+            }
 
             for exp_name, exp_data in exp_dict.items():
                 for metric in TRACKED_METRICS:

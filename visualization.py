@@ -1,5 +1,7 @@
 import matplotlib.pyplot as plt
 import os
+
+import numpy as np
 import pandas as pd
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
@@ -52,8 +54,16 @@ def project_2d(d_inf, method='tsne', plot=False):
     # create the 2D scatter plot
     # fig, ax = plt.subplots()
 
+    if len(d.columns) == 1:
+        x_dtc = d_tag_c.values.reshape(1, -1)[0]
+        y_dtc = 0.5 * np.ones_like(x_dtc)
+        x_dt = d_tag.values.reshape(1, -1)[0]
+        y_dt = 0.5 * np.ones_like(x_dt)
+        x_anom = anomaly.values.reshape(1, -1)[0]
+        y_anom = 0.5 * np.ones_like(x_anom)
+
     # transform
-    if method == "pca":
+    elif method == "pca":
         pca = PCA(n_components=2)
         pca.fit(d)
         reduced_d_tag_c = pca.transform(d_tag_c)
@@ -160,18 +170,18 @@ def project_fdiff(d_inf, f_diff, method='tsne', plot=True, annotate=False, save=
     return
 
 
-
 if __name__ == '__main__':
     # file_name = 'data/DBSCAN_rc50_pmNone/synt_iter1_inf.csv'
     # file_name = 'data/DBSCAN_rc50_pmNone_aug/synt_iter1_inf.csv'
     # file_name = 'results/partial_synthetic/synt_iter0_inf_aug_bf2_inf.csv'
-    file_name = 'results/partial_synthetic/synt_iter0_inf_aug_knn5_inf.csv'
+    file_name = 'results/partial_synthetic/synt_iter0_inf_aug_greedy_inf.csv'
 
     # reading the CSV file
     dataset = pd.read_csv(file_name)
 
     # scatter_3d(d_inf)
-    f_diff = ['0', '1']
-    # f_diff = ['0', '1', '2', '4']
+    # f_diff = ['0', '1']
+    f_diff = ['3']
 
     project_fdiff(d_inf=dataset, f_diff=f_diff, method='tsne', plot=True, annotate=False, save=False)
+    # project_fdiff(d_inf=dataset, f_diff=f_diff, method='pca', plot=True, annotate=False, save=False)

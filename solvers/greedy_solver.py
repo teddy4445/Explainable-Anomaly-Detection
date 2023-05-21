@@ -23,6 +23,7 @@ class GreedySolver(Solver):
                  param: dict = None):
         Solver.__init__(self,
                         param=param)
+        self._depth = param.get('depth', 5)
 
     def solve(self,
               d: pd.DataFrame,
@@ -42,7 +43,7 @@ class GreedySolver(Solver):
                 selected_features = {start_feature}  # Set to store the selected feature names
 
                 # Iterate until all rows or features are selected
-                while len(selected_rows) < num_rows and len(selected_features) < num_features:
+                while len(selected_rows) < self._depth and len(selected_features) < num_features:
                     best_row_score = float('-inf')
                     best_row = None
                     best_feature_score = float('-inf')
