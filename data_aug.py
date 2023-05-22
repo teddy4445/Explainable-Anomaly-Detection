@@ -54,4 +54,4 @@ if __name__ == '__main__':
 
     # save new dataset
     saving_directory = 'partial_synthetic'
-    # dataset_aug.to_csv(f'data/{saving_directory}/{dataset_name}_aug.csv', index=False)
+    dataset_aug.to_csv(f'data/{saving_directory}/{dataset_name}_aug.csv', index=False)
