@@ -7,7 +7,7 @@ from time import time
 # project imports
 from solvers.solver import Solver
 from anomaly_detection_algos.anomaly_algo import AnomalyAlgo
-from explanation_analysis.afes.afes_metric import AfesMetric
+from explanation_analysis.score_function.score_function import ScoreFunction
 
 
 class MonteCarloSolver(Solver):
@@ -25,7 +25,7 @@ class MonteCarloSolver(Solver):
               anomaly_algo: AnomalyAlgo,
               s: list,
               time_limit_seconds: int,
-              scorer: AfesMetric) -> tuple:
+              scorer: ScoreFunction) -> tuple:
         features = d.columns.values
         start_time = time()
         # check what is the best solution

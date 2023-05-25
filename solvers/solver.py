@@ -3,7 +3,7 @@ import pandas as pd
 
 # project imports
 from anomaly_detection_algos.anomaly_algo import AnomalyAlgo
-from explanation_analysis.afes.afes_metric import AfesMetric
+from explanation_analysis.score_function.score_function import ScoreFunction
 
 
 class Solver:
@@ -31,7 +31,7 @@ class Solver:
               d: pd.DataFrame,
               s: list,
               time_limit_seconds: float,
-              scorer: AfesMetric) -> tuple:
+              scorer: ScoreFunction) -> tuple:
         pass
 
     def close_convergence_process(self, time_limit_seconds):

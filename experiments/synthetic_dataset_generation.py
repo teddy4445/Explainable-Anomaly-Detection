@@ -8,7 +8,6 @@ from consts import *
 from anomaly_detection_algos.DBSCAN import DBSCANwrapper
 from anomaly_detection_algos.anomaly_algo import AnomalyAlgo
 from explanation_analysis.similarity_metrices.sim_metric import SimMetric
-from explanation_analysis.similarity_metrices.sim_euclidean import EuclideanSim
 from experiments.experiment_properties.feature_distribution_normal import FeatureDistributionNormal
 
 

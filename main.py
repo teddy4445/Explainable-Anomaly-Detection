@@ -21,10 +21,8 @@ from solvers.greedy_solver import GreedySolver
 from solvers.knn_solver import KnnSolver
 from solvers.mc_solver import MonteCarloSolver
 from solvers.one_ones_solver import OneOneSolver
-from explanation_analysis.afes.afes_sum import AfesSum
-from explanation_analysis.similarity_metrices.sim_euclidean import EuclideanSim
+from explanation_analysis.score_function.linear_score import LinearScore
 from explanation_analysis.similarity_metrices.sim_euclidean_inverse import InverseEuclideanSim
-from explanation_analysis.similarity_metrices.sim_min_inverse import InverseMinSim
 
 
 class Main:
@@ -102,7 +100,11 @@ class Main:
             curr_exp = Experiment(time_limit_seconds=time_limit_seconds)
             curr_exp.run(anomaly_algo=DBSCANwrapper(),
                          solver=exp_data['solver'](param=exp_data['params']),
-                         scorer=AfesSum(sim_module=InverseMinSim(), w_gsim=1, w_ldiff=1, w_lsim=1, w_cov=1),
+                         scorer=LinearScore(sim_module=InverseEuclideanSim(),
+                                            w_self_sim=1,
+                                            w_local_sim=1, w_cluster_sim=1,
+                                            w_local_diff=1, w_cluster_diff=1,
+                                            w_cov=0),
                          anomaly_sample=anomaly_sample, dataset=dataset_wo_anomaly)
 
             # check results
@@ -157,7 +159,11 @@ class Main:
             curr_exp = Experiment(time_limit_seconds=time_limit_seconds)
             curr_exp.run(anomaly_algo=DBSCANwrapper(),
                          solver=exp_data['solver'](param=exp_data['params']),
-                         scorer=AfesSum(sim_module=InverseMinSim(), w_gsim=1, w_ldiff=0.1, w_lsim=10, w_cov=1),
+                         scorer=LinearScore(sim_module=InverseEuclideanSim(),
+                                            w_self_sim=1,
+                                            w_local_sim=1, w_cluster_sim=1,
+                                            w_local_diff=1, w_cluster_diff=1,
+                                            w_cov=0),
                          anomaly_sample=anomaly_sample, dataset=dataset_wo_anomaly)
 
             # check results
@@ -243,12 +249,12 @@ class Main:
                 # 'knn15_fdiff': {'solver': KnnSolver, 'params': {"k": 15, "f_diff": f_diff}},
                 # 'knn15': {'solver': KnnSolver, 'params': {"k": 15}},
                 # 'mc': {'solver': MonteCarloSolver, 'params': {}},
-                # 'bf1': {'solver': BruteForceSolver, 'params': {'columns': ['0', '1'], 'rows_num': 1}},
+                'bf1': {'solver': BruteForceSolver, 'params': {'columns': ['0', '1'], 'rows_num': 1}},
                 # 'bf2': {'solver': BruteForceSolver, 'params': {'columns': ['0', '1'], 'rows_num': 2}},
                 # 'bf3': {'solver': BruteForceSolver, 'params': {'columns': ['0', '1'], 'rows_num': 3}},
                 # 'bf4': {'solver': BruteForceSolver, 'params': {'columns': ['0', '1'], 'rows_num': 4}},
                 # 'bf5': {'solver': BruteForceSolver, 'params': {'columns': ['0', '1'], 'rows_num': 5}},
-                'greedy': {'solver': GreedySolver, 'params': {'depth': 5}},
+                # 'greedy': {'solver': GreedySolver, 'params': {'depth': 5}},
             }
 
             for exp_name, exp_data in exp_dict.items():
@@ -283,7 +289,7 @@ class Main:
             print('Save experiments metadata')
             analysis_dict_2df = {'dataset': file_names}
             analysis_df = Main.save_metadata(analysis_dict_2df=analysis_dict_2df, exp_dict=exp_dict)
-            analysis_df.T.to_csv(os.path.join(results_path, "meta_analysis_greedy.csv"), index=True)
+            analysis_df.T.to_csv(os.path.join(results_path, "meta_analysis_bf.csv"), index=True)
 
 
 if __name__ == '__main__':

@@ -6,7 +6,7 @@ import pandas as pd
 from explanation_analysis.similarity_metrices.sim_metric import SimMetric
 
 
-class AfesMetric:
+class ScoreFunction:
     """
     TODO: noam please add here
     """

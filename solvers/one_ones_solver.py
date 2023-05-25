@@ -7,7 +7,7 @@ from time import time
 # project imports
 from solvers.solver import Solver
 from anomaly_detection_algos.anomaly_algo import AnomalyAlgo
-from explanation_analysis.afes.afes_metric import AfesMetric
+from explanation_analysis.score_function.score_function import ScoreFunction
 
 
 class OneOneSolver(Solver):
@@ -27,7 +27,7 @@ class OneOneSolver(Solver):
               anomaly_algo: AnomalyAlgo,
               s: list,
               time_limit_seconds: int,
-              scorer: AfesMetric) -> tuple:
+              scorer: ScoreFunction) -> tuple:
         # check what is the best solution
         features = list(d.columns.values)
         start_feature = features[random.randrange(len(features))]

@@ -21,15 +21,25 @@ class InverseEuclideanSim(SimMetric):
             features: list,
             mode: str):
         if isinstance(s, pd.Series):
-            s = s[features].values
+            s = s[features].to_numpy()
         if isinstance(d, pd.DataFrame):
             if 0 in d.shape:
                 return 0
-            d = d.mean(axis=0)[features].values
+            d = d[features].to_numpy()
         elif isinstance(d, list) and len(d) > 0 and len(d[0]) > 0:
             d = np.array(d[features]).mean(0)
         else:
             raise ValueError("The argument 'd' must be either a 2-dim list or a pd.DataFrame")
 
+        dist_array = np.linalg.norm(d - s, axis=1)
         # at this stage both 's' and 'd' are lists
-        return 1 / (1 + np.linalg.norm(np.array(d) - np.array(s)))
+        if len(dist_array) == 0:
+            return 0
+        if mode == 'max':
+            if len(features) == 0:
+                return 0
+            return 1 / (1 + np.max(dist_array))
+        elif mode == 'min':
+            if len(features) == 0:
+                return 1
+            return 1 / (1 + np.min(dist_array))

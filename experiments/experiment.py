@@ -5,10 +5,13 @@ import pandas as pd
 
 # project imports
 from solvers.solver import Solver
-from explanation_analysis.afes.afes_metric import AfesMetric
+from explanation_analysis.score_function.score_function import ScoreFunction
 from anomaly_detection_algos.anomaly_algo import AnomalyAlgo
 
-TRACKED_METRICS = {'d_tag', 'shape', 'f_diff', 'f_sim', 'best_score', 'best_ss', 'best_ls', 'best_ld', 'best_cov'}
+TRACKED_METRICS = {
+    'd_tag', 'shape', 'f_diff', 'f_sim', 'best_score',
+    'self_sim', 'local_sim', 'sim_cluster', 'local_diff', 'diff_cluster', 'coverage'
+}
 
 
 class Experiment:
@@ -21,19 +24,12 @@ class Experiment:
         self.results = {}
         self.convert_process = None
         self._time_limit_seconds = time_limit_seconds
-        self.results = {'d_tag': None,
-                        'f_diff': None,
-                        'f_sim': None,
-                        'best_score': None,
-                        'best_ss': None,
-                        'best_ls': None,
-                        'best_ld': None,
-                        'best_cov': None}
+        self.results = {metric: None for metric in TRACKED_METRICS}
 
     def run(self,
             anomaly_algo: AnomalyAlgo,
             solver: Solver,
-            scorer: AfesMetric,
+            scorer: ScoreFunction,
             dataset: pd.DataFrame,
             anomaly_sample: list,
             save_conv=False):

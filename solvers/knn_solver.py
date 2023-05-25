@@ -8,7 +8,7 @@ from sklearn.neighbors import KNeighborsRegressor
 # project imports
 from solvers.solver import Solver
 from anomaly_detection_algos.anomaly_algo import AnomalyAlgo
-from explanation_analysis.afes.afes_metric import AfesMetric
+from explanation_analysis.score_function.score_function import ScoreFunction
 
 
 class KnnSolver(Solver):
@@ -29,7 +29,7 @@ class KnnSolver(Solver):
               d: pd.DataFrame,
               s: list,
               time_limit_seconds: int,
-              scorer: AfesMetric,
+              scorer: ScoreFunction,
               save_conv=False) -> tuple:
         features = d.columns.values
 
@@ -39,30 +39,31 @@ class KnnSolver(Solver):
         rows_indexes = knn.kneighbors(X=[s], n_neighbors=self._k, return_distance=False)[0]
         d_tag_full_f = d.iloc[rows_indexes]
         start_time = time()
+        solution = {}
 
         if self.f_diff:
             ans_fdiff = self.f_diff
             f_sim = [feature for feature in features if feature not in ans_fdiff]
-            best_ans_score = scorer.compute(d=d_tag_full_f, s=s, f_sim=f_sim, f_diff=ans_fdiff, overall_size=len(d))
-            self_sim, local_sim, local_diff, coverage = scorer.compute_parts(d=d_tag_full_f, s=s,
-                                                                             f_sim=f_sim, f_diff=ans_fdiff,
-                                                                             overall_size=len(d))
+            ans_score, scores = scorer.compute(d=d_tag_full_f, s=s, f_sim=f_sim, f_diff=ans_fdiff, overall_size=len(d))
 
             solution = {'d_tag': d_tag_full_f,
                         'shape': (len(d_tag_full_f), len(self.f_diff)),
                         'f_diff': self.f_diff,
                         'f_sim': f_sim,
-                        'best_score': best_ans_score,
-                        'best_ss': self_sim,
-                        'best_ls': local_sim,
-                        'best_ld': local_diff,
-                        'best_cov': coverage}
+                        'best_score': ans_score,
+                        'self_sim': scores['self_sim'],
+                        'local_sim': scores['local_sim'],
+                        'sim_cluster': scores['sim_cluster_score'],
+                        'local_diff': scores['local_diff'],
+                        'diff_cluster': scores['sim_cluster_score'],
+                        'coverage': scores['coverage']}
 
             # save conversion process
             if save_conv:
-                self._save_conversion_process(start_time, rows_indexes, self.f_diff,
-                                              (len(rows_indexes), len(self.f_diff)),
-                                              best_ans_score, self_sim, local_sim, local_diff, coverage)
+                pass
+                # self._save_conversion_process(start_time, rows_indexes, self.f_diff,
+                #                               (len(rows_indexes), len(self.f_diff)),
+                #                               best_ans_score, self_sim, local_sim, local_diff, coverage)
 
         else:
             best_ans_score = float('-inf')
@@ -74,29 +75,30 @@ class KnnSolver(Solver):
                 for cols_indexes in subsets_cols:
                     f_diff = list(cols_indexes)
                     f_sim = [feature for feature in features if feature not in f_diff]
-                    score = scorer.compute(d=d_tag_full_f, s=s, f_sim=f_sim, f_diff=f_diff, overall_size=len(d))
-                    self_sim, local_sim, local_diff, coverage = scorer.compute_parts(d=d_tag_full_f, s=s,
-                                                                                     f_sim=f_sim, f_diff=f_diff,
-                                                                                     overall_size=len(d))
+                    ans_score, scores = scorer.compute(d=d_tag_full_f, s=s,
+                                                       f_sim=f_sim, f_diff=f_diff, overall_size=len(d))
 
                     # if best so far, replace and record
-                    if score > best_ans_score:
-                        best_ans_score = score
+                    if ans_score > best_ans_score:
+                        best_ans_score = ans_score
                         solution = {'d_tag': d_tag_full_f,
                                     'shape': (len(d_tag_full_f), len(f_diff)),
                                     'f_diff': f_diff,
                                     'f_sim': f_sim,
-                                    'best_score': score,
-                                    'best_ss': self_sim,
-                                    'best_ls': local_sim,
-                                    'best_ld': local_diff,
-                                    'best_cov': coverage}
+                                    'best_score': ans_score,
+                                    'self_sim': scores['self_sim'],
+                                    'local_sim': scores['local_sim'],
+                                    'sim_cluster': scores['sim_cluster_score'],
+                                    'local_diff': scores['local_diff'],
+                                    'diff_cluster': scores['sim_cluster_score'],
+                                    'coverage': scores['coverage']}
 
                     # save conversion process
                     if save_conv:
-                        self._save_conversion_process(start_time, rows_indexes, cols_indexes,
-                                                      (len(rows_indexes), len(cols_indexes)),
-                                                      score, self_sim, local_sim, local_diff, coverage)
+                        pass
+                        # self._save_conversion_process(start_time, rows_indexes, cols_indexes,
+                        #                               (len(rows_indexes), len(cols_indexes)),
+                        #                               score, self_sim, local_sim, local_diff, coverage)
 
         if save_conv:
             self.close_convergence_process(time_limit_seconds=time_limit_seconds)
@@ -111,12 +113,13 @@ class KnnSolver(Solver):
         """
         Save the conversion process.
         """
-        self.convert_process["time"].append(time() - start_time)
-        self.convert_process["rows_indexes"].append(rows_indexes)
-        self.convert_process["cols_indexes"].append(cols_indexes)
-        self.convert_process["shape"].append(shape)
-        self.convert_process["score"].append(score)
-        self.convert_process["self_sim"].append(self_sim)
-        self.convert_process["local_sim"].append(local_sim)
-        self.convert_process["local_diff"].append(local_diff)
-        self.convert_process["coverage"].append(coverage)
+        pass
+        # self.convert_process["time"].append(time() - start_time)
+        # self.convert_process["rows_indexes"].append(rows_indexes)
+        # self.convert_process["cols_indexes"].append(cols_indexes)
+        # self.convert_process["shape"].append(shape)
+        # self.convert_process["score"].append(score)
+        # self.convert_process["self_sim"].append(self_sim)
+        # self.convert_process["local_sim"].append(local_sim)
+        # self.convert_process["local_diff"].append(local_diff)
+        # self.convert_process["coverage"].append(coverage)

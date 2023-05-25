@@ -7,7 +7,7 @@ from sklearn.neighbors import KNeighborsRegressor
 # project imports
 from solvers.solver import Solver
 from anomaly_detection_algos.anomaly_algo import AnomalyAlgo
-from explanation_analysis.afes.afes_metric import AfesMetric
+from explanation_analysis.score_function.score_function import AfesMetric
 
 
 class TeddyKnnSolver(Solver):

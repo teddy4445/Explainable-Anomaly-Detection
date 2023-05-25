@@ -11,7 +11,7 @@ from tqdm import tqdm
 
 from solvers.solver import Solver
 from anomaly_detection_algos.anomaly_algo import AnomalyAlgo
-from explanation_analysis.afes.afes_metric import AfesMetric
+from explanation_analysis.score_function.score_function import ScoreFunction
 
 
 class GreedySolver(Solver):
@@ -30,11 +30,13 @@ class GreedySolver(Solver):
               anomaly_algo: AnomalyAlgo,
               s: list,
               time_limit_seconds: int,
-              scorer: AfesMetric,
+              scorer: ScoreFunction,
               save_conv=False) -> tuple:
         features = d.columns.values
         num_rows, num_features = d.shape
         best_score = float('-inf')
+        solution = {}
+        selected_rows = {}
 
         # Iterate through each feature as a starting point
         for start_feature in d.columns:
@@ -53,11 +55,11 @@ class GreedySolver(Solver):
                     for row_index, row in d.iterrows():
                         if row_index not in selected_rows:
                             current_rows = selected_rows.union({row_index})
-                            current_score = scorer.compute(d=d.iloc[list(current_rows)], s=s,
-                                                           f_sim=[feature for feature in features if
-                                                                  feature not in selected_features],
-                                                           f_diff=list(selected_features),
-                                                           overall_size=len(d))
+                            current_score, _ = scorer.compute(d=d.iloc[list(current_rows)], s=s,
+                                                              f_sim=[feature for feature in features if
+                                                                     feature not in selected_features],
+                                                              f_diff=list(selected_features),
+                                                              overall_size=len(d))
 
                             if current_score > best_row_score:
                                 best_row_score = current_score
@@ -67,11 +69,11 @@ class GreedySolver(Solver):
                     for feature in d.columns:
                         if feature not in selected_features:
                             current_features = selected_features.union({feature})
-                            current_score = scorer.compute(d=d.iloc[list(selected_rows)], s=s,
-                                                           f_sim=[feature for feature in features if
-                                                                  feature not in current_features],
-                                                           f_diff=list(current_features),
-                                                           overall_size=len(d))
+                            current_score, _ = scorer.compute(d=d.iloc[list(selected_rows)], s=s,
+                                                              f_sim=[feature for feature in features if
+                                                                     feature not in current_features],
+                                                              f_diff=list(current_features),
+                                                              overall_size=len(d))
 
                             if current_score > best_feature_score:
                                 best_feature_score = current_score
@@ -84,17 +86,11 @@ class GreedySolver(Solver):
                         selected_features.add(best_feature)
 
                 # Check if the current subset is better than the previous best subset
-                current_score = scorer.compute(d=d.iloc[list(selected_rows)], s=s,
-                                               f_sim=[feature for feature in features if
-                                                      feature not in selected_features],
-                                               f_diff=list(selected_features),
-                                               overall_size=len(d))
-                self_sim, local_sim, local_diff, coverage = scorer.compute_parts(d=d.iloc[list(selected_rows)], s=s,
-                                                                                 f_sim=[feature for feature in features
-                                                                                        if feature
-                                                                                        not in selected_features],
-                                                                                 f_diff=list(selected_features),
-                                                                                 overall_size=len(d))
+                current_score, scores = scorer.compute(d=d.iloc[list(selected_rows)], s=s,
+                                                       f_sim=[feature for feature in features if
+                                                              feature not in selected_features],
+                                                       f_diff=list(selected_features),
+                                                       overall_size=len(d))
 
                 if current_score > best_score:
                     best_score = current_score
@@ -103,10 +99,12 @@ class GreedySolver(Solver):
                                 'f_diff': list(selected_features),
                                 'f_sim': [feature for feature in features if feature not in selected_features],
                                 'best_score': current_score,
-                                'best_ss': self_sim,
-                                'best_ls': local_sim,
-                                'best_ld': local_diff,
-                                'best_cov': coverage}
+                                'self_sim': scores['self_sim'],
+                                'local_sim': scores['local_sim'],
+                                'sim_cluster': scores['sim_cluster_score'],
+                                'local_diff': scores['local_diff'],
+                                'diff_cluster': scores['sim_cluster_score'],
+                                'coverage': scores['coverage']}
 
         if save_conv:
             self.close_convergence_process(time_limit_seconds=time_limit_seconds)
