@@ -37,7 +37,7 @@ class LinearScore(ScoreFunction):
         scores = self.compute_parts(d=d, s=s, f_sim=f_sim, f_diff=f_diff, overall_size=overall_size)
         score = self.w_self_sim * scores["self_sim"] \
                 + self.w_local_sim * scores["local_sim"] + self.w_cluster_sim * scores["sim_cluster_score"] \
-                + self.w_local_diff * scores["local_diff"] + self.w_cluster_diff * scores["diff_cluster_score"] \
+                - self.w_local_diff * scores["local_diff"] + self.w_cluster_diff * scores["diff_cluster_score"] \
                 + self.w_cov * scores["coverage"]
         return score, scores
 

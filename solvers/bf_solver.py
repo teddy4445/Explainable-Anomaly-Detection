@@ -131,6 +131,36 @@ class BruteForceSolver(Solver):
                                     'coverage': scores['coverage']}
             assoc[best_row_indexes] = 1
 
+        if self.rows_num:
+            subsets_rows = list(itertools.combinations(list(range(d.shape[0])), self.rows_num))
+            for rows_indexes in subsets_rows:
+                rows_indexes = list(rows_indexes)
+                ans = d.loc[rows_indexes]
+                subsets_cols = list(chain.from_iterable(combinations(features, r) for r in range(1, d.shape[1] + 1)))
+                for cols_indexes in subsets_cols:
+                    cols_indexes = list(cols_indexes)
+                    # score it
+                    current_score, scores = scorer.compute(d=ans, s=s, f_diff=cols_indexes, overall_size=len(d),
+                                                           f_sim=[feature for feature in features if
+                                                                  feature not in cols_indexes])
+
+                    # if best so far, replace and record
+                    if current_score > best_ans_score:
+                        best_ans_score = current_score
+                        best_row_indexes = rows_indexes
+                        solution = {'d_tag': ans,
+                                    'shape': (self.rows_num, len(cols_indexes)),
+                                    'f_diff': cols_indexes,
+                                    'f_sim': [feature for feature in features if feature not in cols_indexes],
+                                    'best_score': best_ans_score,
+                                    'self_sim': scores['self_sim'],
+                                    'local_sim': scores['local_sim'],
+                                    'sim_cluster': scores['sim_cluster_score'],
+                                    'local_diff': scores['local_diff'],
+                                    'diff_cluster': scores['sim_cluster_score'],
+                                    'coverage': scores['coverage']}
+            assoc[best_row_indexes] = 1
+
         else:
             for d_tag_size in tqdm(range(1, d.shape[0] + 1)):
                 for f_diff_size in range(1, d.shape[1] + 1):

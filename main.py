@@ -249,11 +249,12 @@ class Main:
                 # 'knn15_fdiff': {'solver': KnnSolver, 'params': {"k": 15, "f_diff": f_diff}},
                 # 'knn15': {'solver': KnnSolver, 'params': {"k": 15}},
                 # 'mc': {'solver': MonteCarloSolver, 'params': {}},
-                'bf1': {'solver': BruteForceSolver, 'params': {'columns': ['0', '1'], 'rows_num': 1}},
+                # 'bf1': {'solver': BruteForceSolver, 'params': {'columns': ['0', '1'], 'rows_num': 1}},
                 # 'bf2': {'solver': BruteForceSolver, 'params': {'columns': ['0', '1'], 'rows_num': 2}},
                 # 'bf3': {'solver': BruteForceSolver, 'params': {'columns': ['0', '1'], 'rows_num': 3}},
                 # 'bf4': {'solver': BruteForceSolver, 'params': {'columns': ['0', '1'], 'rows_num': 4}},
                 # 'bf5': {'solver': BruteForceSolver, 'params': {'columns': ['0', '1'], 'rows_num': 5}},
+                'bf_full': {'solver': BruteForceSolver, 'params': {}},
                 # 'greedy': {'solver': GreedySolver, 'params': {'depth': 5}},
             }
 
