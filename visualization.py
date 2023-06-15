@@ -171,8 +171,10 @@ def project_fdiff(d_inf, f_diff, method='tsne', plot=True, annotate=False, save=
 
 
 if __name__ == '__main__':
-    # file_name = 'data/DBSCAN_rc50_pmNone/synt_iter1_inf.csv'
-    file_name = 'data/DBSCAN_rc50_pmNone_aug/synt_iter1_inf.csv'
+    # file_name = 'data/DBSCAN_rc50_pmNone/synt_iter0_inf.csv'
+    # file_name = 'data/DBSCAN_rc50_pmNone_aug/synt_iter0_inf.csv'
+    file_name = 'data/partial_synthetic/synt_iter0_inf_aug.csv'
+    # file_name = 'results/partial_synthetic/old/synt_iter0_inf_aug_knn5_fdiff_inf.csv'
     # file_name = 'results/partial_synthetic/synt_iter0_inf_aug_bf2_inf.csv'
     # file_name = 'results/partial_synthetic/synt_iter6_inf_aug_greedy_inf.csv'
 

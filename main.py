@@ -242,8 +242,8 @@ class Main:
             file_names = []
 
             exp_dict = {
-                # 'knn5_fdiff': {'solver': KnnSolver, 'params': {"k": 5, "f_diff": f_diff}},
-                # 'knn5': {'solver': KnnSolver, 'params': {"k": 5}},
+                'knn5_fdiff': {'solver': KnnSolver, 'params': {"k": 5, "f_diff": f_diff}},
+                'knn5': {'solver': KnnSolver, 'params': {"k": 5}},
                 # 'knn10_fdiff': {'solver': KnnSolver, 'params': {"k": 10, "f_diff": f_diff}},
                 # 'knn10': {'solver': KnnSolver, 'params': {"k": 10}},
                 # 'knn15_fdiff': {'solver': KnnSolver, 'params': {"k": 15, "f_diff": f_diff}},
@@ -254,7 +254,7 @@ class Main:
                 # 'bf3': {'solver': BruteForceSolver, 'params': {'columns': ['0', '1'], 'rows_num': 3}},
                 # 'bf4': {'solver': BruteForceSolver, 'params': {'columns': ['0', '1'], 'rows_num': 4}},
                 # 'bf5': {'solver': BruteForceSolver, 'params': {'columns': ['0', '1'], 'rows_num': 5}},
-                'bf_full': {'solver': BruteForceSolver, 'params': {}},
+                # 'bf_full': {'solver': BruteForceSolver, 'params': {}},
                 # 'greedy': {'solver': GreedySolver, 'params': {'depth': 5}},
             }
 
@@ -290,7 +290,7 @@ class Main:
             print('Save experiments metadata')
             analysis_dict_2df = {'dataset': file_names}
             analysis_df = Main.save_metadata(analysis_dict_2df=analysis_dict_2df, exp_dict=exp_dict)
-            analysis_df.T.to_csv(os.path.join(results_path, "meta_analysis_bf.csv"), index=True)
+            analysis_df.T.to_csv(os.path.join(results_path, "meta_analysis_knn5.csv"), index=True)
 
 
 if __name__ == '__main__':
