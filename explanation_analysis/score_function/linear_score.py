@@ -11,6 +11,10 @@ class LinearScore(ScoreFunction):
     """
     A weighted sum of the tree components
     """
+    PARTIAL_SCORE_NAMES = ["self_sim",
+                           "local_sim", "sim_cluster_score",
+                           "local_diff", "diff_cluster_score",
+                           "coverage", "conciseness"]
 
     def __init__(self,
                  sim_module: SimMetric,
@@ -19,7 +23,8 @@ class LinearScore(ScoreFunction):
                  w_cluster_sim: float = 1.0,
                  w_local_diff: float = 1.0,
                  w_cluster_diff: float = 1.0,
-                 w_cov: float = 0):
+                 w_cov: float = 0,
+                 w_conc: float = 0.05):
         ScoreFunction.__init__(self, sim_module=sim_module)
         self.w_self_sim = w_self_sim
         self.w_local_sim = w_local_sim
@@ -27,6 +32,7 @@ class LinearScore(ScoreFunction):
         self.w_local_diff = w_local_diff
         self.w_cluster_diff = w_cluster_diff
         self.w_cov = w_cov
+        self.w_conc = w_conc
 
     def compute(self,
                 overall_size: int,
@@ -38,7 +44,7 @@ class LinearScore(ScoreFunction):
         score = self.w_self_sim * scores["self_sim"] \
                 + self.w_local_sim * scores["local_sim"] + self.w_cluster_sim * scores["sim_cluster_score"] \
                 - self.w_local_diff * scores["local_diff"] + self.w_cluster_diff * scores["diff_cluster_score"] \
-                + self.w_cov * scores["coverage"]
+                + self.w_cov * scores["coverage"] + self.w_conc * scores["conciseness"]
         return score, scores
 
     def compute_parts(self,
@@ -62,8 +68,9 @@ class LinearScore(ScoreFunction):
         sim_cluster_score = 0  # TODO: Add cluster score
         diff_cluster_score = 0  # TODO: Add cluster score
 
-        # coverage score
+        # coverages score
         coverage = self.w_cov * len(d) / overall_size
+        conciseness = self.w_conc * len(f_sim)
 
         scores = {
             "self_sim": self_sim,
@@ -71,6 +78,7 @@ class LinearScore(ScoreFunction):
             "sim_cluster_score": sim_cluster_score,
             "local_diff": local_diff,
             "diff_cluster_score": diff_cluster_score,
-            "coverage": coverage
+            "coverage": coverage,
+            "conciseness": conciseness
         }
         return scores
