@@ -69,8 +69,8 @@ class LinearScore(ScoreFunction):
         diff_cluster_score = 0  # TODO: Add cluster score
 
         # coverages score
-        coverage = self.w_cov * len(d) / overall_size
-        conciseness = self.w_conc * len(f_sim)
+        coverage = len(d) / overall_size
+        conciseness = len(f_sim)
 
         scores = {
             "self_sim": self_sim,
