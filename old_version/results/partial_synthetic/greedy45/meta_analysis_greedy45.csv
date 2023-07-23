@@ -1,0 +1,22 @@
+,0,1
+dataset,synt_iter0_inf_aug,synt_iter6_inf_aug
+greedy4_diff_cluster,0,0
+greedy5_diff_cluster,0,0
+greedy4_local_sim,0.9572761808702996,0.9597519083694747
+greedy5_local_sim,0.9572761808702996,0.9597519083694747
+greedy4_sim_cluster,0,0
+greedy5_sim_cluster,0,0
+greedy4_local_diff,0.4678523516376214,0.4023291731864633
+greedy5_local_diff,0.4678523516376214,0.4023291731864633
+greedy4_f_diff,"['4', '1', '0']","['4', '1', '0']"
+greedy5_f_diff,"['4', '1', '0']","['4', '1', '0']"
+greedy4_self_sim,0.938978815530396,0.9181601824186402
+greedy5_self_sim,0.938978815530396,0.9181601824186402
+greedy4_best_score,1.5284026447630743,1.5755829176016516
+greedy5_best_score,1.5284026447630743,1.5755829176016516
+greedy4_f_sim,"['2', '3']","['2', '3']"
+greedy5_f_sim,"['2', '3']","['2', '3']"
+greedy4_coverage,0.04081632653061224,0.04081632653061224
+greedy5_coverage,0.04081632653061224,0.04081632653061224
+greedy4_shape,"(2, 3)","(2, 3)"
+greedy5_shape,"(2, 3)","(2, 3)"

@@ -1,0 +1,57 @@
+{
+    "conf": {
+        "dataset_filename": "synt0.csv",
+        "supervised": true,
+        "solver": {
+            "type": "BruteForce",
+            "params": {
+                "columns_num": 2,
+                "rows_num": 3
+            }
+        },
+        "scorer": {
+            "type": "linear",
+            "params": {
+                "w_self_sim": 1.0,
+                "w_local_sim": 1.0,
+                "w_cluster_sim": 0,
+                "w_local_diff": 1.0,
+                "w_cluster_diff": 0,
+                "w_cov": 0,
+                "w_conc": 0.08
+            }
+        },
+        "similarity_metric": "inverse_euclidean"
+    },
+    "solution": {
+        "shape": [
+            3,
+            2
+        ],
+        "f_diff": [
+            "0",
+            "4"
+        ],
+        "f_sim": [
+            "1",
+            "2",
+            "3"
+        ],
+        "rows_indexes": [
+            41,
+            42,
+            48
+        ],
+        "best_score": 1.5419783112810925,
+        "sub_scores": {
+            "self_sim": 0.8816812784960343,
+            "local_sim": 0.8923163648449183,
+            "sim_cluster": 0,
+            "local_diff": 0.4720193320598601,
+            "diff_cluster": 0,
+            "coverage": 0.061224489795918366,
+            "conciseness": 3
+        }
+    },
+    "d_inf_filename": "results/synt0_csv_BruteForce_linear_inverse_euclidean_7073d443-932a-4abe-9419-451923876e37_d_inf.csv"
+}

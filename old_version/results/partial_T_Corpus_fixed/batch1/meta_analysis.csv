@@ -1,0 +1,13 @@
+,0,1
+dataset,dataR2,dataset_48_tae
+greedy4_self_sim,0.09888007918224996,1.0
+greedy4_sim_cluster,0,0
+greedy4_coverage,0.017391304347826087,0.013333333333333334
+greedy4_conciseness,8,2
+greedy4_diff_cluster,0,0
+greedy4_best_score,0.738289142468342,2.1202966211560006
+greedy4_f_diff,['Leptin'],"['Course', 'Course_instructor', 'Class_size']"
+greedy4_f_sim,"['Age', 'BMI', 'Glucose', 'Insulin', 'HOMA', 'Adiponectin', 'Resistin', 'MCP.1']","['Whether_of_not_the_TA_is_a_native_English_speaker', 'Summer_or_regular_semester']"
+greedy4_shape,"(2, 1)","(2, 3)"
+greedy4_local_diff,0.014422293404252556,0.0397033788439994
+greedy4_local_sim,0.013831356690344526,1.0

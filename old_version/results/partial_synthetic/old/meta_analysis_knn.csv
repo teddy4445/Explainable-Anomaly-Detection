@@ -1,0 +1,18 @@
+,0
+dataset,synt_iter0_inf_aug
+knn5_fdiff_best_score,0.48947477538259876
+knn5_best_score,0.9270123743907426
+knn5_fdiff_best_cov,0.10204081632653061
+knn5_best_cov,0.10204081632653061
+knn5_fdiff_shape,"(5, 2)"
+knn5_shape,"(5, 4)"
+knn5_fdiff_f_diff,"['0', '1']"
+knn5_f_diff,"['2', '1', '4', '0']"
+knn5_fdiff_best_ls,0.5545707362475838
+knn5_best_ls,0.9210792571927962
+knn5_fdiff_best_ss,0.5218473952889365
+knn5_best_ss,0.5218473952889365
+knn5_fdiff_best_ld,0.6889841724804521
+knn5_best_ld,0.6179550944175206
+knn5_fdiff_f_sim,"['2', '3', '4']"
+knn5_f_sim,['3']

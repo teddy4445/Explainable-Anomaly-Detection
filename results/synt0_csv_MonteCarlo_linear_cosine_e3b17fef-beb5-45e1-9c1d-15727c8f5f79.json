@@ -1,0 +1,58 @@
+{
+    "conf": {
+        "dataset_filename": "synt0.csv",
+        "supervised": true,
+        "solver": {
+            "type": "MonteCarlo",
+            "params": {
+                "time_limit_seconds": 10
+            }
+        },
+        "scorer": {
+            "type": "linear",
+            "params": {
+                "w_self_sim": 1.0,
+                "w_local_sim": 1.0,
+                "w_cluster_sim": 0,
+                "w_local_diff": 1.0,
+                "w_cluster_diff": 0,
+                "w_cov": 0,
+                "w_conc": 0.08
+            }
+        },
+        "similarity_metric": "cosine"
+    },
+    "solution": {
+        "shape": [
+            5,
+            1
+        ],
+        "f_diff": [
+            "0"
+        ],
+        "f_sim": [
+            "1",
+            "2",
+            "3",
+            "4"
+        ],
+        "rows_indexes": [
+            27,
+            24,
+            31,
+            2,
+            11
+        ],
+        "best_score": 4.3933631064802485,
+        "sub_scores": {
+            "self_sim": 0.9556391885971813,
+            "local_sim": 0.866208255447584,
+            "sim_cluster": 0,
+            "local_diff": -2.251515662435483,
+            "diff_cluster": 0,
+            "coverage": 0.10204081632653061,
+            "conciseness": 4
+        }
+    },
+    "d_inf_filename": "results/synt0_csv_MonteCarlo_linear_cosine_e3b17fef-beb5-45e1-9c1d-15727c8f5f79_d_inf.csv"
+}

@@ -1,0 +1,58 @@
+{
+    "batch_conf": {
+        "datasets": [
+            {
+                "filename": "synt0.csv",
+                "supervised": true
+            }
+        ],
+        "solvers": {
+            "MonteCarlo": [
+                {
+                    "time_limit_seconds": 10
+                }
+            ]
+        },
+        "scorers": {
+            "linear": [
+                {
+                    "w_self_sim": 1.0,
+                    "w_local_sim": 1.0,
+                    "w_cluster_sim": 0,
+                    "w_local_diff": 1.0,
+                    "w_cluster_diff": 0,
+                    "w_cov": 0,
+                    "w_conc": 0.08
+                }
+            ]
+        },
+        "similarity_metrics": [
+            "cosine"
+        ]
+    },
+    "experiments": {
+        "e3b17fef-beb5-45e1-9c1d-15727c8f5f79": {
+            "dataset_filename": "synt0.csv",
+            "supervised": true,
+            "solver": {
+                "type": "MonteCarlo",
+                "params": {
+                    "time_limit_seconds": 10
+                }
+            },
+            "scorer": {
+                "type": "linear",
+                "params": {
+                    "w_self_sim": 1.0,
+                    "w_local_sim": 1.0,
+                    "w_cluster_sim": 0,
+                    "w_local_diff": 1.0,
+                    "w_cluster_diff": 0,
+                    "w_cov": 0,
+                    "w_conc": 0.08
+                }
+            },
+            "similarity_metric": "cosine"
+        }
+    }
+}

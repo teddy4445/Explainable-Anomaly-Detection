@@ -1,0 +1,44 @@
+{
+    "datasets": [
+        {
+            "filename": "synt0.csv",
+            "supervised": true
+        },
+        {
+            "filename": "synt6.csv",
+            "supervised": true
+        }
+    ],
+    "solvers": {
+        "BruteForce": [
+            {
+                "columns_num": 2,
+                "rows_num": 1
+            }
+        ],
+        "Greedy": [
+            {
+                "depth": 2
+            }
+        ],
+        "KNN": [
+            {
+                "k": 5
+            }
+        ]
+    },
+    "scorers": {
+        "linear": [
+            {
+                "w_self_sim": 1.0,
+                "w_local_sim": 1.0,
+                "w_cluster_sim": 0,
+                "w_local_diff": 1.0,
+                "w_cluster_diff": 0,
+                "w_cov": 0,
+                "w_conc": 0.08
+            }
+        ]
+    },
+    "similarity_metrics": ["inverse_euclidean"]
+}
