@@ -1,9 +1,11 @@
 pandas~=1.5.3
 numpy~=1.23.5
 matplotlib~=3.6.3
-seaborn
+seaborn~=0.12.2
 scikit-learn~=1.2.1
 scipy~=1.10.0
 pyod~=1.0.7
 tqdm~=4.65.0
 memory-profiler==0.61.0
+shap~=0.42.1
+PyYAML~=6.0.1
