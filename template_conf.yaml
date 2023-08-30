@@ -1,22 +1,24 @@
 ---
 
 datasets:
-    - filename: synt0.csv
-      supervised: true
+#    - filename: synt0.csv
+#      supervised: true
 #    - filename: synt6.csv
 #      supervised: true
+    - filename: synt0.csv
+      supervised: false
 
 solvers:
-    BruteForce:
-        - {columns_num: 2, rows_num: 3}
+#    BruteForce:
+#        - {columns_num: 2, rows_num: 3}
 #        - {}
 #    Greedy:
 #        - depth: 2
 #    KNN:
 #        - {k: 5}
 #        - {k: 5, f_diff: []}
-#    MonteCarlo:
-#        - {time_limit_seconds: 10}
+    MonteCarlo:
+        - {time_limit_seconds: 10}
 #    TeddyKNN:
 #        - {k: 5}
 

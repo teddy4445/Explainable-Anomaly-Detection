@@ -50,3 +50,6 @@ class IsolationForestwrapper(AnomalyAlgo):
         This method used to inference
         """
         return self.model.predict(X=x)
+
+    def predict_scores(self, x):
+        return self.model.decision_function(X=x)

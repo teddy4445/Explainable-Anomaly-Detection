@@ -43,6 +43,9 @@ class AnomalyAlgo:
         # metric = accuracy_score
         # TODO: finish later
 
+    def predict_scores(self, x):
+        pass
+
     def fit_than_predict(self,
                          x: pd.DataFrame,
                          x_predict: pd.DataFrame,

@@ -30,18 +30,18 @@ class Dataloader:
         # TODO: Change to an AD-based
         ad_algo = IsolationForestwrapper()
         ad_algo.fit(df)
-        labels = ad_algo.predict(df)
-        anomaly_indexes = [i for i in range(len(labels)) if labels[i] == 1]
+        # anomaly_scores = ad_algo.predict(df)
+        anomaly_index = ad_algo.predict_scores(df).argmax()
 
-        anomaly_sample = df.iloc[anomaly_indexes[0]]  # first anomaly
+        anomaly_sample = df.iloc[anomaly_index]  # most anomalous
         dataset_wo_anomaly = pd.concat(
-            [df.iloc[:anomaly_indexes[0]], df.iloc[anomaly_indexes[0] + 1:]],
+            [df.iloc[:anomaly_index], df.iloc[anomaly_index + 1:]],
             ignore_index=True)
         return anomaly_sample, dataset_wo_anomaly
 
     def load_dataset(self, data_filename, supervised=False):
-        supervised_directory = 'supervised' if supervised else 'unsupervised'
-        df = pd.read_csv(os.path.join(DATA_FOLDER_PATH, supervised_directory, data_filename))
+        directory = 'supervised' if supervised else 'unsupervised'
+        df = pd.read_csv(os.path.join(DATA_FOLDER_PATH, directory, data_filename))
         anomaly_row, dataset_wo_anomaly = self.get_supervised_anomaly(df) if supervised \
             else self.get_unsupervised_anomaly(df)
         return Data(data=df, anomaly_row=anomaly_row, data_wo_anomaly=dataset_wo_anomaly)
