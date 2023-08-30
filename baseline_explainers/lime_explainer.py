@@ -18,6 +18,7 @@ class LimeExplainer(BaselineExplainer):
         explainer = LimeTabularExplainer(self.data.values, feature_names=self.data.columns.values.tolist(),
                                          class_names=["non-anom", "anom"], discretize_continuous=True)
         exp = explainer.explain_instance(data_row=anomaly.values, predict_fn=pseudo_ad_model.predict_proba)
+        # exp.as_pyplot_figure()
 
         return exp
 

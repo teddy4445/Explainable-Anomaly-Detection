@@ -15,13 +15,17 @@ class ShapExplainer(BaselineExplainer):
         # Use SHAP to explain the model's decisions
         pseudo_ad_model = self.trained_pseudo_ad_model(anomaly=anomaly)
         explainer = shap.Explainer(pseudo_ad_model)
-        shap_values = explainer(anomaly)
+        explanation = explainer(anomaly)
+        explanation.values = explanation.values[:, 1]
+        explanation.base_values = explanation.base_values[0, 1]
+        shap.plots.waterfall(explanation)
 
-        return shap_values
+        return explainer(anomaly)
 
 
 if __name__ == '__main__':
     import pandas as pd
+
     filename = '../datasets/supervised/synt0.csv'
     df = pd.read_csv(filename)
 
@@ -30,6 +34,7 @@ if __name__ == '__main__':
     dataset_wo_anomaly = dataset.loc[df['assoc'] != 2].reset_index(drop=True)
 
     from sklearn.ensemble import RandomForestClassifier
+
     classifier = RandomForestClassifier
     explainer = ShapExplainer(data=dataset_wo_anomaly, classifier=classifier)
 

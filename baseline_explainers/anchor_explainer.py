@@ -36,7 +36,6 @@ if __name__ == '__main__':
     dataset_wo_anomaly = dataset.loc[df['assoc'] != 2].reset_index(drop=True)
 
     from sklearn.ensemble import RandomForestClassifier
-
     classifier = RandomForestClassifier
     explainer = AnchorExplainer(data=dataset_wo_anomaly, classifier=classifier, threshold=0.95)
 

@@ -11,7 +11,7 @@ class ACVExplainer(BaselineExplainer):
     Active Coalition of Variables
     """
 
-    def __init__(self, data, classifier=None, mode='waterfall'):
+    def __init__(self, data, classifier=None, mode=None):
         super().__init__(data=data, classifier=classifier)
         self.mode = mode
 
