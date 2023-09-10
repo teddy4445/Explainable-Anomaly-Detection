@@ -9,6 +9,7 @@ from experiment import Experiment
 import solvers as solvers
 import scorers.score_function as score_function
 import scorers.similarity_metrics as similarity_metrics
+from baseline_explainers import BASELINE_EXPLAINERS
 
 
 class Main:
@@ -52,12 +53,11 @@ class Main:
                           method=method, plot=plot, annotate=annotate,
                           save_filename=f'results/{experiment.uuid}' if save else None)
 
-    def setup_experiment(self, experiment):
+    def setup_experiment(self, experiment, dataset):
         self.experiment_batch[experiment.uuid] = experiment
         conf = experiment.experiment_conf
 
-        experiment.dataset = self.dataloader.load_dataset(data_filename=conf["dataset_filename"],
-                                                          supervised=conf["supervised"])
+        experiment.dataset = dataset
 
         similarity_metric = similarity_metrics.SIMILARITY_FUNCTIONS[conf["similarity_metric"]]()
         scorer_class = score_function.SCORERS[conf["scorer"]["type"]]
@@ -68,23 +68,38 @@ class Main:
         return solver
 
     def run(self):
-        for experiment_conf in self.conf_manager.get_experiments_conf():
-            curr_experiment = Experiment(experiment_conf=experiment_conf)
-            solver = self.setup_experiment(experiment=curr_experiment)
+        for batch in self.conf_manager.get_experiment_batches():
+            batch_dataset, batch_model = self.dataloader.load_dataset(data_filename=batch["dataset"],
+                                                                      supervised=batch["supervised"],
+                                                                      model_name=batch["model"])
+            for experiment_conf in batch["experiment_list"]:
+                curr_experiment = Experiment(experiment_conf=experiment_conf)
+                solver = self.setup_experiment(experiment=curr_experiment, dataset=batch_dataset)
 
-            try:
-                print(f'Solving dataset {experiment_conf["dataset_filename"]} '
-                      f'using {experiment_conf["solver"]["type"]} solver '
-                      f'and {experiment_conf["scorer"]["type"]} scorer')
-                curr_experiment.solution = solver.solve()
-                self.visualize_experiment(experiment=curr_experiment, method='tsne', plot=True, annotate=False, save=True)
-                self.dump_experiment(experiment=curr_experiment)
+                try:
+                    print(f'Solving dataset {experiment_conf["dataset_filename"]} '
+                          f'using {experiment_conf["solver"]["type"]} solver '
+                          f'and {experiment_conf["scorer"]["type"]} scorer')
+                    curr_experiment.solution = solver.solve()
+                    # self.visualize_experiment(experiment=curr_experiment, method='tsne', plot=True, annotate=False,
+                    #                           save=False)
+                    # self.visualize_experiment(experiment=curr_experiment, method='tsne', plot=True, annotate=False,
+                    #                           save=True)
+                    # self.dump_experiment(experiment=curr_experiment)
 
-            except Exception as e:
-                print(f'Failed to solve dataset {experiment_conf["dataset_filename"]} '
-                      f'using {experiment_conf["solver"]["type"]} solver and {experiment_conf["scorer"]["type"]} scorer'
-                      f' - moving on to next experiment')
-                traceback.print_exc()
+                except Exception as e:
+                    print(f'Failed to solve dataset {experiment_conf["dataset_filename"]} '
+                          f'using {experiment_conf["solver"]["type"]} solver and {experiment_conf["scorer"]["type"]} scorer'
+                          f' - moving on to next experiment')
+                    traceback.print_exc()
+
+            for alternative_explainer in batch["alternative_explainers"]:
+                explainer = BASELINE_EXPLAINERS[alternative_explainer](data=batch_dataset.data_wo_anomaly,
+                                                                       model=batch_model,
+                                                                       mode='clf' if batch["supervised"] else 'ad')
+                explanation = explainer.get_explanation(anomaly=batch_dataset.anomaly_row)
+                # pass
+                print()
 
         self.dump_batch_metadata()
 

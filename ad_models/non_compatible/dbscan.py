@@ -3,10 +3,13 @@ import pandas as pd
 from sklearn.cluster import DBSCAN
 
 # project imports
-from ad_algos.anomaly_algo import AnomalyAlgo
+from ad_models.ad_model import AnomalyDetectionModel
 
 
-class DBSCANwrapper(AnomalyAlgo):
+class DBSCAN(AnomalyDetectionModel):
+    """
+    DBSCAN  ------------------ Not being used
+    """
     def __init__(self,
                  eps=0.5,
                  min_samples=5,
@@ -15,7 +18,7 @@ class DBSCANwrapper(AnomalyAlgo):
                  leaf_size=30,
                  p=None,
                  n_jobs=None):
-        AnomalyAlgo.__init__(self)
+        AnomalyDetectionModel.__init__(self)
         self.model = DBSCAN(eps=eps,
                             min_samples=min_samples,
                             metric=metric,
@@ -28,15 +31,8 @@ class DBSCANwrapper(AnomalyAlgo):
     def fit(self,
             x: pd.DataFrame,
             y: pd.DataFrame = None):
-        """
-        This method used to train the algorithm
-        """
-        self.model.fit(X=x,
-                       y=y)
+        self.model.fit(X=x, y=y)
 
     def predict(self,
                 x: pd.DataFrame):
-        """
-        This method used to inference - but is also training the model first
-        """
         return [val == -1 for val in self.model.fit_predict(X=x)]

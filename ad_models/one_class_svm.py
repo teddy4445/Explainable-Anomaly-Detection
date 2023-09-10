@@ -3,19 +3,10 @@ import pandas as pd
 from pyod.models.ocsvm import OCSVM
 
 # project imports
-from ad_algos.anomaly_algo import AnomalyAlgo
+from ad_models.ad_model import AnomalyDetectionModel
 
 
-class OneClassSVMwrapper(AnomalyAlgo):
-    """
-    A ...
-    """
-
-    # CONSTS #
-    NAME = "OneClassSVM"
-
-    # END - CONSTS #
-
+class OneClassSVM(AnomalyDetectionModel):
     def __init__(self,
                  kernel='rbf',
                  degree: int = 3,
@@ -28,7 +19,7 @@ class OneClassSVMwrapper(AnomalyAlgo):
                  verbose=False,
                  max_iter: int = -1,
                  contamination: float = 0.1):
-        AnomalyAlgo.__init__(self)
+        AnomalyDetectionModel.__init__(self)
         self.model = OCSVM(kernel=kernel,
                            degree=degree,
                            gamma=gamma,
@@ -41,17 +32,13 @@ class OneClassSVMwrapper(AnomalyAlgo):
                            max_iter=max_iter,
                            contamination=contamination)
 
-    def fit(self,
-            x: pd.DataFrame,
-            y: pd.DataFrame = None):
-        """
-        This method used to train the algorithm
-        """
-        self.model.fit(X=x, y=y)
+    def fit(self, x: pd.DataFrame, y: pd.DataFrame = None):
+        self.model.fit(X=x)
 
-    def predict(self,
-                x: pd.DataFrame):
-        """
-        This method used to inference
-        """
+    def predict(self, x: pd.DataFrame):
         return self.model.predict(X=x)
+
+    def anomaly_scores(self, x):
+        # decision_function(X) - The anomaly score of the input samples
+        # predict_proba(X, method='linear', return_confidence=False) - Probability of a sample being outlier
+        return self.model.predict_proba(X=x)

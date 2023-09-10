@@ -1,8 +1,11 @@
 from collections import OrderedDict
 import os
+import numpy as np
 import pandas as pd
+from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 
-from ad_algos.IsolationForest import IsolationForestwrapper
+from models import AD_MODELS, CLF_MODELS
+from baseline_explainers import BASELINE_EXPLAINERS
 
 DATA_FOLDER_PATH = os.path.join(os.path.dirname(__file__), 'datasets')
 
@@ -19,29 +22,57 @@ class Dataloader:
         pass
 
     @staticmethod
-    def get_supervised_anomaly(df):
-        dataset = df[[feature for feature in df.columns.values if feature != 'assoc']]
-        anomaly_sample = dataset.loc[df['assoc'] == 2].iloc[-1]
-        dataset_wo_anomaly = dataset.loc[df['assoc'] != 2].reset_index(drop=True)
-        return anomaly_sample, dataset_wo_anomaly
+    def encode_categorical_data(df, mode="one-hot"):
+        all_cat_cols = df.select_dtypes(include=['object']).columns
+        affective_cat_cols = [col for col in all_cat_cols if df[col].nunique() > 2]
+        simple_cat_cols = [col for col in all_cat_cols if col not in affective_cat_cols]
+        non_cat_cols = [col for col in df.columns if col not in all_cat_cols]
+
+        if mode == 'label':
+            encoder = LabelEncoder()
+            for column in all_cat_cols:
+                df[column] = encoder.fit_transform(df[column])
+        elif mode == 'one-hot':
+            encoder = OneHotEncoder(handle_unknown="ignore", sparse=False)
+            encoded_cat_feats = encoder.fit_transform(df.loc[:, affective_cat_cols])
+            encoded_cat_feats_name = encoder.get_feature_names_out(affective_cat_cols)
+            encoded_df = pd.DataFrame(encoded_cat_feats, columns=encoded_cat_feats_name)
+
+            label_encoder = LabelEncoder()
+            for column in simple_cat_cols:
+                encoded_df[column] = label_encoder.fit_transform(df[column])
+
+            for column in non_cat_cols:
+                encoded_df[column] = df[column]
+
+        return encoded_df
 
     @staticmethod
-    def get_unsupervised_anomaly(df):
-        # TODO: Change to an AD-based
-        ad_algo = IsolationForestwrapper()
-        ad_algo.fit(df)
-        # anomaly_scores = ad_algo.predict(df)
-        anomaly_index = ad_algo.predict_scores(df).argmax()
+    def get_anomaly(df, model_name, supervised):
+        if not supervised:
+            model = AD_MODELS[model_name['type']]()  # TODO: add params
+            model.fit(X=df)
+            anomaly_index = model.predict_proba(df)[:, 1].argmax()
 
-        anomaly_sample = df.iloc[anomaly_index]  # most anomalous
-        dataset_wo_anomaly = pd.concat(
-            [df.iloc[:anomaly_index], df.iloc[anomaly_index + 1:]],
-            ignore_index=True)
-        return anomaly_sample, dataset_wo_anomaly
+            anomaly_sample = df.iloc[anomaly_index]  # most anomalous
+            dataset_wo_anomaly = pd.concat([df.iloc[:anomaly_index],
+                                            df.iloc[anomaly_index + 1:]],
+                                           ignore_index=True)
+        else:
+            model = CLF_MODELS[model_name['type']]()  # TODO: add params
+            dataset = df[[feature for feature in df.columns.values if feature != 'assoc']]
+            anomaly_sample = dataset.loc[df['assoc'] == 2].iloc[-1]
+            dataset_wo_anomaly = dataset.loc[df['assoc'] != 2].reset_index(drop=True)
 
-    def load_dataset(self, data_filename, supervised=False):
+            combined_data = np.vstack([dataset_wo_anomaly] + len(dataset_wo_anomaly) * [anomaly_sample])
+            combined_labels = len(dataset_wo_anomaly) * [0] + len(dataset_wo_anomaly) * [1]
+            model.fit(combined_data, combined_labels)
+
+        return anomaly_sample, dataset_wo_anomaly, model
+
+    def load_dataset(self, data_filename, supervised=False, model_name=None):
         directory = 'supervised' if supervised else 'unsupervised'
         df = pd.read_csv(os.path.join(DATA_FOLDER_PATH, directory, data_filename))
-        anomaly_row, dataset_wo_anomaly = self.get_supervised_anomaly(df) if supervised \
-            else self.get_unsupervised_anomaly(df)
-        return Data(data=df, anomaly_row=anomaly_row, data_wo_anomaly=dataset_wo_anomaly)
+        df = self.encode_categorical_data(df=df, mode="one-hot")
+        anomaly_row, dataset_wo_anomaly, model = self.get_anomaly(df=df, model_name=model_name, supervised=supervised)
+        return Data(data=df, anomaly_row=anomaly_row, data_wo_anomaly=dataset_wo_anomaly), model

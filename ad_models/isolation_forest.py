@@ -3,18 +3,10 @@ import pandas as pd
 from pyod.models.iforest import IForest
 
 # project imports
-from ad_algos.anomaly_algo import AnomalyAlgo
+from ad_models.ad_model import AnomalyDetectionModel
 
 
-class IsolationForestwrapper(AnomalyAlgo):
-    """
-    A ...
-    """
-
-    # CONSTS #
-    NAME = "IsolationForest"
-    # END - CONSTS #
-
+class IsolationForest(AnomalyDetectionModel):
     def __init__(self,
                  n_estimators: int = 100,
                  max_samples='auto',
@@ -24,8 +16,8 @@ class IsolationForestwrapper(AnomalyAlgo):
                  n_jobs: int = 1,
                  behaviour='old',
                  random_state: int = None,
-                 verbose: int =0):
-        AnomalyAlgo.__init__(self)
+                 verbose: int = 0):
+        AnomalyDetectionModel.__init__(self)
         self.model = IForest(n_estimators=n_estimators,
                              max_samples=max_samples,
                              contamination=contamination,
@@ -36,20 +28,13 @@ class IsolationForestwrapper(AnomalyAlgo):
                              random_state=random_state,
                              verbose=verbose)
 
-    def fit(self,
-              x: pd.DataFrame,
-              y: pd.DataFrame = None):
-        """
-        This method used to train the algorithm
-        """
-        self.model.fit(X=x, y=y)
+    def fit(self, x: pd.DataFrame, y: pd.DataFrame = None):
+        self.model.fit(X=x)
 
-    def predict(self,
-                x: pd.DataFrame):
-        """
-        This method used to inference
-        """
+    def predict(self, x: pd.DataFrame):
         return self.model.predict(X=x)
 
-    def predict_scores(self, x):
-        return self.model.decision_function(X=x)
+    def anomaly_scores(self, x):
+        # decision_function(X) - The anomaly score of the input samples
+        # predict_proba(X, method='linear', return_confidence=False) - Probability of a sample being outlier
+        return self.model.predict_proba(X=x)

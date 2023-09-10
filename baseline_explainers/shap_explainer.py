@@ -3,22 +3,21 @@ from baseline_explainers.baseline_explainer import BaselineExplainer
 
 
 class ShapExplainer(BaselineExplainer):
-    """
-    A Shap-based approach
-    """
-
-    def __init__(self, data, classifier=None, mode='waterfall'):
-        super().__init__(data=data, classifier=classifier)
-        self.mode = mode
+    def __init__(self, data, model=None, mode=None):
+        super().__init__(data=data, model=model, mode=mode)
 
     def get_explanation(self, anomaly):
-        # Use SHAP to explain the model's decisions
-        pseudo_ad_model = self.trained_pseudo_ad_model(anomaly=anomaly)
-        explainer = shap.Explainer(pseudo_ad_model)
+        # pseudo_ad_model = self.trained_pseudo_ad_model(anomaly=anomaly)
+        explainer = shap.Explainer(self.model)
         explanation = explainer(anomaly)
-        explanation.values = explanation.values[:, 1]
-        explanation.base_values = explanation.base_values[0, 1]
-        shap.plots.waterfall(explanation)
+
+        if self.mode == 'clf':
+            explanation.values = explanation.values[:, 1]
+            explanation.base_values = explanation.base_values[0, 1]
+        elif self.mode == 'ad':
+            explanation.base_values = explanation.base_values[0, 0]
+        shap.plots.bar(explanation, show=False)
+        self.save_barplot_explanation(path='results', name='shap', show=False)
 
         return explainer(anomaly)
 
@@ -36,7 +35,7 @@ if __name__ == '__main__':
     from sklearn.ensemble import RandomForestClassifier
 
     classifier = RandomForestClassifier
-    explainer = ShapExplainer(data=dataset_wo_anomaly, classifier=classifier)
+    explainer = ShapExplainer(data=dataset_wo_anomaly, model=classifier)
 
     explanation = explainer.get_explanation(anomaly=anomaly_sample)
     print(explanation)

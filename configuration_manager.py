@@ -25,37 +25,55 @@ class ConfigurationManager:
         else:
             raise ConfigurationError("Unknown configuration format")
 
-    def _get_solver_combs(self):
-        all_solvers = []
-        for solver in self.configuration["solvers"]:
-            for params in self.configuration["solvers"][solver]:
-                all_solvers.append({"type": solver, "params": params})
-        return all_solvers
+    @staticmethod
+    def _get_param_variations(conf_obj):
+        all_variations = []
+        for variation in conf_obj:
+            for params in conf_obj[variation]:
+                all_variations.append({"type": variation, "params": params})
+        return all_variations
 
-    def _get_scorer_combs(self):
-        all_scorers = []
-        for scorer in self.configuration["scorers"]:
-            for params in self.configuration["scorers"][scorer]:
-                all_scorers.append({"type": scorer, "params": params})
-        return all_scorers
-
-    def get_experiments_conf(self):
-        all_solvers = self._get_solver_combs()
-        all_scorers = self._get_scorer_combs()
+    def _get_experiments_conf(self, data_filename, supervised, model):
+        all_solvers = self._get_param_variations(conf_obj=self.configuration["solvers"])
+        all_scorers = self._get_param_variations(conf_obj=self.configuration["scorers"])
 
         experiments = []
 
-        for data in self.configuration["datasets"]:
-            for solver in all_solvers:
-                for scorer in all_scorers:
-                    for similarity_metric in self.configuration["similarity_metrics"]:
-                        experiment_conf = {
-                            "dataset_filename": data["filename"],
-                            "supervised": data["supervised"],
-                            "solver": solver,
-                            "scorer": scorer,
-                            "similarity_metric": similarity_metric
-                        }
-                        experiments.append(experiment_conf)
+        for solver in all_solvers:
+            for scorer in all_scorers:
+                for similarity_metric in self.configuration["similarity_metrics"]:
+                    experiment_conf = {
+                        "dataset_filename": data_filename,
+                        "supervised": supervised,
+                        "model": model,
+                        "solver": solver,
+                        "scorer": scorer,
+                        "similarity_metric": similarity_metric
+                    }
+                    experiments.append(experiment_conf)
 
         return experiments
+
+    def get_experiment_batches(self):
+        all_classification_models = self._get_param_variations(conf_obj=self.configuration["clf_models"])
+        all_ad_models = self._get_param_variations(conf_obj=self.configuration["ad_models"])
+
+        batches = []
+        supervised_batches = [(supervised_dataset, classification_model, True)
+                              for supervised_dataset in self.configuration["supervised_datasets"] or []
+                              for classification_model in all_classification_models]
+        unsupervised_batches = [(unsupervised_dataset, ad_model, False)
+                                for unsupervised_dataset in self.configuration["unsupervised_datasets"] or []
+                                for ad_model in all_ad_models]
+
+        for dataset, model, supervised in supervised_batches + unsupervised_batches:
+            experiment_list = self._get_experiments_conf(data_filename=dataset,
+                                                         supervised=supervised,
+                                                         model=model)
+            batches.append({"supervised": supervised,
+                            "dataset": dataset,
+                            "model": model,
+                            "experiment_list": experiment_list,
+                            "alternative_explainers": self.configuration["alternative_explainers"] or []})
+
+        return batches

@@ -3,10 +3,10 @@ import pandas as pd
 from sklearn.covariance import EllipticEnvelope
 
 # project imports
-from ad_algos.anomaly_algo import AnomalyAlgo
+from ad_models.ad_model import AnomalyDetectionModel
 
 
-class EllipticEnvelopewrapper(AnomalyAlgo):
+class EllipticEnvelope(AnomalyDetectionModel):
     """
     A ...
     """
@@ -21,7 +21,7 @@ class EllipticEnvelopewrapper(AnomalyAlgo):
                  support_fraction=None,
                  contamination: float = 0.1,
                  random_state: int = None):
-        AnomalyAlgo.__init__(self)
+        AnomalyDetectionModel.__init__(self)
         self.model = EllipticEnvelope(store_precision=store_precision,
                                       assume_centered=assume_centered,
                                       support_fraction=support_fraction,

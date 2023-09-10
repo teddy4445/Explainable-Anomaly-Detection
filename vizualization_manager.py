@@ -36,13 +36,13 @@ class VisualizationManager:
         # Calculate the color scale normalization based on the first matrix
         norm = Normalize(vmin=dist_df.min().min(), vmax=dist_df.max().max())
 
-        sns.heatmap(dist_df, ax=dist_axs[0], cmap='RdYlGn', norm=norm, annot=True)
+        sns.heatmap(dist_df, ax=dist_axs[0], cmap='RdYlGn', norm=norm, annot=False)
         dist_axs[0].set_title('Distance Matrix')
 
-        sns.heatmap(dist_df_sim, ax=dist_axs[1], cmap='RdYlGn', norm=norm, annot=True)  # Green to Red, RdYlGn_r
+        sns.heatmap(dist_df_sim, ax=dist_axs[1], cmap='RdYlGn', norm=norm, annot=False)  # Green to Red, RdYlGn_r
         dist_axs[1].set_title('Distance Matrix - Over F_sim')
 
-        sns.heatmap(dist_df_diff, ax=dist_axs[2], cmap='RdYlGn', norm=norm, annot=True)  # Red to Green, RdYlGn
+        sns.heatmap(dist_df_diff, ax=dist_axs[2], cmap='RdYlGn', norm=norm, annot=False)  # Red to Green, RdYlGn
         dist_axs[2].set_title('Distance Matrix - Over F_diff')
 
     def project_2d(self, d_partial, method='tsne'):

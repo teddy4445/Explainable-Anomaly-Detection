@@ -4,23 +4,18 @@ from baseline_explainers.baseline_explainer import BaselineExplainer
 
 
 class LimeExplainer(BaselineExplainer):
-    """
-    Lime-based approach
-    """
-
-    def __init__(self, data, classifier=None, mode='waterfall'):
-        super().__init__(data=data, classifier=classifier)
-        self.mode = mode
+    def __init__(self, data, model=None, mode=None):
+        super().__init__(data=data, model=model, mode=mode)
 
     def get_explanation(self, anomaly, threshold=0.95):
-        # Use SHAP to explain the model's decisions
-        pseudo_ad_model = self.trained_pseudo_ad_model(anomaly=anomaly)
-        explainer = LimeTabularExplainer(self.data.values, feature_names=self.data.columns.values.tolist(),
+        explainer = LimeTabularExplainer(self.data.values, feature_names=self.features,
                                          class_names=["non-anom", "anom"], discretize_continuous=True)
-        exp = explainer.explain_instance(data_row=anomaly.values, predict_fn=pseudo_ad_model.predict_proba)
-        # exp.as_pyplot_figure()
+        explanation = explainer.explain_instance(data_row=anomaly.values, predict_fn=self.model.predict_proba)
+        fig = explanation.as_pyplot_figure()
+        self.save_barplot_explanation(path='results', name='lime', show=False)
+        print(explanation.as_list())
 
-        return exp
+        return explanation
 
 
 if __name__ == '__main__':
@@ -36,7 +31,7 @@ if __name__ == '__main__':
     from sklearn.ensemble import RandomForestClassifier
 
     classifier = RandomForestClassifier
-    explainer = LimeExplainer(data=dataset_wo_anomaly, classifier=classifier)
+    explainer = LimeExplainer(data=dataset_wo_anomaly, model=classifier)
 
     explanation = explainer.get_explanation(anomaly=anomaly_sample)
     print('\n'.join(map(str, explanation.as_list())))

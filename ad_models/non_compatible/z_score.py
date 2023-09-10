@@ -4,12 +4,12 @@ import pandas as pd
 
 # project imports
 from consts import *
-from ad_algos.anomaly_algo import AnomalyAlgo
+from ad_models.ad_model import AnomalyAlgo
 
 
 class Zscore(AnomalyAlgo):
     """
-    A z-score
+    A z-score ------------------ Not being used
     """
 
     # CONSTS #
